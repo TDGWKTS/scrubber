@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cross-flow scrubber · As built — Machine Skill × Anatomy (3D + P&ID + CSV Historian)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cross-flow scrubber · As built — Machine Skill × Anatomy</title>
 <meta name="description" content="The real horizontal cross-flow wet scrubber, re-rendered from site photographs: grey bolted FRP vessel, tapered outlet, centrifugal ID fan with blue motor, front service rack. Machine Skill physics runtime with Anatomy parts-list and geometry-audit discipline.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +48,154 @@ import * as BGU from 'three/addons/utils/BufferGeometryUtils.js'
 
 export { THREE }
 export const LAYER_FX = 1 // transparent effects: kept out of the AO and contact shadow passes
+
+// ---------------------------------------------------------------- i18n (English / 繁體中文)
+// One dictionary for the whole page. Any element carrying data-i18n="key" is
+// repainted on a language change; page-level dynamic text uses tr() directly.
+const I18N = {
+  en: {
+    docTitle: 'Cross-flow scrubber · As built — Machine Skill × Anatomy',
+    no: 'No. 05', title: 'Cross-flow scrubber', sub: 'horizontal · as built — site unit',
+    prompt: 'the real horizontal cross-flow scrubber', pill0: 'three.js', pill1: 'Physics', pill2: 'Film',
+    howSummary: 'How it is computed', heroLabel: 'SO₂ removal',
+    gasLoad: 'Gas load', turndown: 'Turndown', overload: 'Overload',
+    'modes.pause': 'Pause', 'modes.run': 'Run', 'modes.explode': 'Explode', 'modes.cut': 'Cut away',
+    'modes.xray': 'X-ray', 'modes.slow': 'Slow', 'modes.labels': 'Labels', 'modes.break': 'Trip the pump',
+    quality: 'Quality', 'quality.high': 'High', 'quality.balanced': 'Balanced', 'quality.lite': 'Lite', autoShort: '(auto)',
+    'state.inCompliance': 'in compliance', 'state.absorbing': 'absorbing',
+    'state.breakingThrough': 'breaking through', 'state.pumpTripped': 'pump tripped',
+    so2out: 'SO₂ out', gas: 'gas', liquor: 'liquor', sump: 'sump',
+    playDemo: 'Play demo', pauseDemo: 'Pause demo', resumeDemo: 'Resume demo',
+    closeDemo: 'Close demo', toolCloseDemo: 'Close the demo and restore the controls (Esc)',
+    building: 'Building · ', buildCount: 'of {n} parts', buildSub: '{t} triangles · {m} materials',
+    view2d: '2D view', view3d: '3D view', viewpid: 'P&I', manual: 'Manual',
+    toolPlay: 'Play the guided tour (D)', toolRestart: 'Restart the demo',
+    toolQuality: 'Cycle render quality (Q)', tool2d: 'Switch to the 2D side elevation (2)',
+    tool3d: 'Return to the 3D model (2)', toolPid: 'Open the P&I diagram (P)', toolPidOff: 'Close the P&I diagram (P)',
+    toolLang: 'Switch language', toolManual: 'Open the control manual',
+    hudLoad: 'GAS LOAD', hudRem: 'SO₂ REMOVAL', hudOutlet: 'OUTLET', hudPumpTripped: 'PUMP TRIPPED',
+    swipeHint: 'SWIPE TO PAN →',
+    'film.runBeat': 'It runs on real chemistry.',
+    'film.runSub': 'Gas crosses four caustic-wetted pads sideways; removal compounds stage by stage.',
+    'film.breakBeat': 'Trip the pump.',
+    'film.breakSub': 'The pads dry out: SO₂ breaks through in seconds.',
+    ch1Title: 'The as-built machine',
+    ch1Text: 'A horizontal cross-flow wet scrubber: 7.2 m of bolted FRP vessel, a continuous sump skirt and an ID fan. 38,589 parts, 1.24 million triangles.',
+    ch2Title: 'Dirty gas enters',
+    ch2Text: '20,000 Nm³/h of gas at 150 °C enters the left duct. The inlet spray quenches it to its adiabatic saturation temperature, about 43 °C.',
+    ch3Title: 'Cross-flow contact',
+    ch3Text: 'Cut away the shell: four 0.6 m packing stages. Alkaline liquor rains down from the roof headers while the gas crosses sideways.',
+    ch4Title: 'Removal compounds stage by stage',
+    ch4Text: 'Each pad removes a fraction of what reaches it: η = 1 − Π(1 − ηstage). Watch the SO₂ removal figure settle near 97.5 %.',
+    ch5Title: 'Change the gas load',
+    ch5Text: 'The solver re-runs every frame: psychrometric quench, Onda wetted area, Eckert pressure drop and four-stage mass transfer. The numbers are live, not canned.',
+    ch6Title: 'Trip the recirculation pump',
+    ch6Text: 'Now break it. The liquor stops, the pads dry out and SO₂ breaks through within seconds — the pH, ORP and outlet readings all sag first.',
+    ch7Title: 'Restore and explore',
+    ch7Text: 'The pump comes back and the liquor recovers. Everything on this page is driven by the same physics solver — take over with the controls below.',
+    elevLabels: [
+      'CROSS-FLOW WET SCRUBBER', 'SIDE ELEVATION · AS BUILT · 1:50', 'DIRTY GAS 150 °C',
+      'DOSING SKID · NaOH / H₂SO₄', 'ALKALINE SUMP · pH 8.5', 'QUENCH · 43 °C SATURATION',
+      'ROOF SPRAY HEADERS', 'DEMISTER', 'TAPERED OUTLET', 'ID FAN', 'BLUE MOTOR',
+      '4 × 0.6 m PACKING STAGES', '7.2 m',
+      'SECTION A–A · GAS CROSSES THE LIQUOR-WETTED PADS SIDEWAYS',
+    ],
+    pidLabels: [
+      'P&I DIAGRAM · CROSS-FLOW SCRUBBER', 'PROCESS & INSTRUMENTATION · AS BUILT',
+      'INLET GAS · 150 °C', 'CLEAN GAS', 'QUENCH', 'PACKING STAGES P1–P4', 'DEMISTER',
+      'ALKALINE SUMP', 'ROOF SPRAY HEADER', 'P-101 RECIRC PUMP', 'T-102 NaOH TANK',
+      'P-102 NaOH DOSING', 'T-103 H₂SO₄ TANK', 'P-103 ACID TRIM', 'TO DCS / PLC',
+      'LEGEND', 'PROCESS LINE', 'SIGNAL LINE', 'INSTRUMENT', 'CONTROL VALVE', 'STACK',
+    ],
+    pidEquipment: 'EQUIPMENT',
+    howBody: "The as-built site unit, modelled from photographs of the real machine — grey bolted FRP panels, a continuous sump skirt, a tapered outlet transition and a centrifugal ID fan — sized the way a process engineer sizes one. The gas stays near floor level and crosses the liquor-wetted pads sideways, so the vessel is long and low instead of tall — the layout you pick when headroom is tight. The 20,000 Nm³/h of 150 °C gas is quenched to its adiabatic saturation temperature in the inlet spray zone (psychrometric balance, Tetens vapour pressure, bisection: about 43 °C). Under each spray bar hangs a water curtain — a continuous falling liquor sheet — and it then crosses four 0.6 m packing stages in series: each stage removes a fraction of what reaches it, so removal compounds stage by stage, η = 1 − Π(1 − η<sub>stage</sub>), with NTU per stage = K<sub>G</sub>a·t/u<sub>G</sub> over the 0.6 m thickness. K<sub>G</sub>a is anchored to published caustic-scrubber values for 50 mm Pall rings (≈2.6 s<sup>−1</sup>) and scaled each frame with gas rate, Onda wetted area, liquor rate and wetting state. Pressure drop is the Eckert generalised correlation per unit depth over the full 2.4 m of pad, plus quench and demister allowances — cross-flow keeps face velocity low, so the total lands near the tower’s despite the longer path. Purification is two-chemical (on the real unit the dosing skid — two vertical dosing pumps with a bunded day tank — stands at the inlet end, as modelled): the alkaline dose (NaOH) is stoichiometric ×1.15 on absorbed SO₂, and a dilute acid trim (H₂SO₄) at the outlet end neutralises alkaline carry-over, bringing the spent liquor back toward pH 7; pump power is ρgQH/η at 52 m³/h and 18 m. Instrumentation: pH transmitters watch the alkaline sump (target 8.5) and the acid-trimmed outlet (target pH 7), and an ORP transmitter tracks oxidation of absorbed sulphite to sulphate (about +320 mV in service); all three readings sag when the liquor stagnates after a pump trip, which is how the operator sees the failure before breakthrough. Simplified: plug flow across the pads, constant pH, uniform spray distribution, no SO₃ or fly-ash load.",
+  },
+  zh: {
+    docTitle: '橫流式洗滌塔 · 實機還原 — Machine Skill × Anatomy',
+    no: '第 05 號', title: '橫流式洗滌塔', sub: '臥式 · 實機還原 — 現場機組',
+    prompt: '真實臥式橫流洗滌塔', pill0: 'three.js', pill1: '物理', pill2: '影像',
+    howSummary: '計算方法', heroLabel: 'SO₂ 去除率',
+    gasLoad: '氣量負荷', turndown: '低負荷', overload: '超負荷',
+    'modes.pause': '暫停', 'modes.run': '運行', 'modes.explode': '分解', 'modes.cut': '剖切',
+    'modes.xray': '透視', 'modes.slow': '慢放', 'modes.labels': '標註', 'modes.break': '泵跳閘',
+    quality: '畫質', 'quality.high': '高', 'quality.balanced': '均衡', 'quality.lite': '輕量', autoShort: '(自動)',
+    'state.inCompliance': '達標', 'state.absorbing': '吸收中',
+    'state.breakingThrough': '已穿透', 'state.pumpTripped': '泵已跳閘',
+    so2out: 'SO₂ 出口', gas: '氣量', liquor: '液量', sump: '塔底',
+    playDemo: '播放演示', pauseDemo: '暫停演示', resumeDemo: '繼續演示',
+    closeDemo: '關閉演示', toolCloseDemo: '關閉演示並還原控制 (Esc)',
+    building: '組裝中 · ', buildCount: '共 {n} 個零件', buildSub: '{t} 三角面 · {m} 種材質',
+    view2d: '二維視圖', view3d: '三維視圖', viewpid: 'P&I 圖', manual: '手冊',
+    toolPlay: '播放引導演示 (D)', toolRestart: '重新播放演示',
+    toolQuality: '切換渲染畫質 (Q)', tool2d: '切換到二維側視圖 (2)',
+    tool3d: '返回三維模型 (2)', toolPid: '打開管道儀表圖 (P)', toolPidOff: '關閉管道儀表圖 (P)',
+    toolLang: '切換語言', toolManual: '打開操作手冊',
+    hudLoad: '氣量負荷', hudRem: 'SO₂ 去除率', hudOutlet: '出口', hudPumpTripped: '泵已跳閘',
+    swipeHint: '← 左右滑動查看 →',
+    'film.runBeat': '它按真實化學過程運行。',
+    'film.runSub': '氣體橫向穿過四級鹼液潤濕的填料，去除率逐級疊加。',
+    'film.breakBeat': '讓循環泵跳閘。',
+    'film.breakSub': '填料變乾，SO₂ 在數秒內穿透。',
+    ch1Title: '實機結構',
+    ch1Text: '臥式橫流濕式洗滌塔：7.2 米螺栓連接玻璃鋼殼體、連續塔底液槽與引風機。38,589 個零件，124 萬三角面。',
+    ch2Title: '含硫煙氣進入',
+    ch2Text: '20,000 Nm³/h、150 °C 的煙氣從左側風管進入。入口噴淋將其急冷至絕熱飽和溫度，約 43 °C。',
+    ch3Title: '橫向錯流接觸',
+    ch3Text: '剖開殼體：四級 0.6 米填料層。鹼液自頂部噴淋管落下，煙氣則橫向穿過填料。',
+    ch4Title: '去除率逐級疊加',
+    ch4Text: '每層填料只去除進入其中的一部分：η = 1 − Π(1 − η級)。注意 SO₂ 去除率穩定在約 97.5 %。',
+    ch5Title: '改變氣量負荷',
+    ch5Text: '求解器每幀重算：絕熱急冷、Onda 潤濕面積、Eckert 壓降與四級傳質。數字是實時計算，而非預錄。',
+    ch6Title: '循環泵跳閘',
+    ch6Text: '現在製造故障：液流中斷、填料變乾，SO₂ 數秒內穿透 —— pH、ORP 與出口讀數會先一步下跌。',
+    ch7Title: '恢復並自行探索',
+    ch7Text: '泵恢復、液量回升。本頁所有內容都由同一個物理求解器驅動 —— 現在交給下方控件，自由探索。',
+    elevLabels: [
+      '臥式橫流濕式洗滌塔', '側視圖 · 實機還原 · 1:50', '含硫煙氣 150 °C',
+      '加藥撬塊 · NaOH / H₂SO₄', '鹼性塔底液槽 · pH 8.5', '急冷 · 43 °C 飽和',
+      '頂部噴淋總管', '除霧器', '漸縮出口', '引風機', '藍色電機',
+      '4 × 0.6 m 填料層', '7.2 m',
+      'A–A 剖面 · 煙氣橫向穿過鹼液潤濕的填料',
+    ],
+    pidLabels: [
+      '管道儀表流程圖 · 橫流式洗滌塔', '工藝與儀表 · 實機還原',
+      '入口煙氣 · 150 °C', '淨化煙氣', '急冷段', '填料層 P1–P4', '除霧器',
+      '鹼性塔底液槽', '頂部噴淋總管', 'P-101 循環泵', 'T-102 NaOH 儲罐',
+      'P-102 NaOH 加藥泵', 'T-103 H₂SO₄ 儲罐', 'P-103 酸調節泵', '至 DCS / PLC',
+      '圖例', '工藝管線', '信號線', '儀表', '調節閥', '排氣筒',
+    ],
+    pidEquipment: '設備表',
+    howBody: '本機按現場照片建模 —— 灰色螺栓連接玻璃鋼板、連續塔底液槽、漸縮出口過渡段與離心引風機 —— 並按工藝工程師的口徑定尺寸。煙氣貼近地面、橫向穿過鹼液潤濕的填料，因此殼體長而矮，而非細高：這正是層高受限時選用的佈置。20,000 Nm³/h、150 °C 的煙氣在入口噴淋段被急冷到絕熱飽和溫度（濕空氣平衡、Tetens 蒸汽壓、二分法求解，約 43 °C）。每根噴淋管下方形成連續下落的液幕，隨後煙氣依次穿過四層 0.6 m 填料：每層只去除進入其中的一部分，故去除率逐級疊加，η = 1 − Π(1 − η<sub>級</sub>)，每級傳質單元數 NTU = K<sub>G</sub>a·t/u<sub>G</sub>，厚度為 0.6 m。K<sub>G</sub>a 取自己發表的 50 mm 鮑爾環鹼洗塔數據（約 2.6 s<sup>−1</sup>），並每幀按氣量、Onda 潤濕面積、液量與潤濕狀態修正。壓降採用 Eckert 通用關聯式沿 2.4 m 總填料深度積分，再加上急冷段與除霧器餘量；橫流使截面氣速較低，儘管流程更長，總壓降仍與塔式相近。淨化採用雙藥劑（實機入口端設有加藥撬塊 —— 兩臺立式計量泵與帶圍堰的日用罐，模型中已還原）：NaOH 按吸收 SO₂ 的化學計量 ×1.15 投加，出口端的稀 H₂SO₄ 微調中和鹼液夾帶，使排液回到 pH 7 附近；泵功率按 ρgQH/η 計算，流量 52 m³/h、揚程 18 m。儀表：pH 變送器監測鹼性塔底液槽（目標 8.5）與酸化後的出口（目標 pH 7），ORP 變送器跟蹤亞硫酸鹽氧化為硫酸鹽的過程（運行約 +320 mV）；泵跳閘後液體停滯，三處讀數都會下降。',
+  },
+}
+let LANG = 'en'
+try { LANG = localStorage.getItem('scrubber-lang') === 'zh' ? 'zh' : 'en' } catch (e) { /* file:// may block storage */ }
+const LSUB = []
+/** Translate a key; values may be strings or arrays (SVG label sets). */
+export const tr = (k) => I18N[LANG]?.[k] ?? I18N.en[k] ?? k
+/** Translation with a fallback, so the shared kit still works on pages without a dictionary entry. */
+export const trOr = (k, fallback) => { const v = I18N[LANG]?.[k] ?? I18N.en[k]; return v === undefined ? fallback : v }
+export const getLang = () => LANG
+export const onLang = (f) => { LSUB.push(f) }
+/** Repaint every element that opted into a translation attribute. */
+export function applyI18n() {
+  for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = tr(el.dataset.i18n)
+  for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = tr(el.dataset.i18nHtml)
+  for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = tr(el.dataset.i18nTitle)
+  for (const el of document.querySelectorAll('[data-i18n-aria]')) el.setAttribute('aria-label', tr(el.dataset.i18nAria))
+  document.title = tr('docTitle')
+}
+export const setLang = (l) => {
+  LANG = l === 'zh' ? 'zh' : 'en'
+  try { localStorage.setItem('scrubber-lang', LANG) } catch (e) { /* ignore */ }
+  document.documentElement.lang = LANG === 'zh' ? 'zh-TW' : 'en'
+  document.documentElement.classList.toggle('lang-zh', LANG === 'zh')
+  applyI18n()
+  // Subscribers repaint text that is generated by JavaScript (mode buttons,
+  // hero, subtitles, SVG drawings, HUD...). Registered in DOM order.
+  for (const f of LSUB) { try { f(LANG) } catch (e) { console.warn('lang hook', e) } }
+  return LANG
+}
 
 // ---------------------------------------------------------------- math
 
@@ -548,11 +696,26 @@ html,body { margin:0; height:100%; background:var(--paper); color:var(--ink); fo
 .lab-pills { position:absolute; right:4.2vw; top:5.4vh; display:flex; gap:1.4em; font-size:clamp(11px,0.95vw,18px); color:var(--ink) }
 .lab-pills span::before { content:''; display:inline-block; width:0.5em; height:0.5em; border-radius:50%; background:var(--ink); margin-right:0.45em; vertical-align:0.08em }
 .lab-pills span.off { color:var(--faint) } .lab-pills span.off::before { background:none; box-shadow:inset 0 0 0 1px var(--faint) }
-.lab-side { position:absolute; right:4.2vw; top:50%; transform:translateY(-50%); width:clamp(250px,22.5vw,440px) }
+/* One right-hand rail owns the readouts AND the "How it is computed" panel.
+   When the panel is expanded the rail scrolls as a unit, so its long text can
+   never grow upward across the title / big number / slider. */
+.lab-rail { position:absolute; right:4.2vw; top:0; bottom:4.2vh; width:clamp(250px,22.5vw,440px); display:flex; flex-direction:column; justify-content:center; pointer-events:none; scrollbar-width:thin; scrollbar-color:var(--faint) transparent }
+.lab-rail > .lab-side { position:static; transform:none; width:100%; flex:0 0 auto }
+.lab-rail.how-open { top:10vh; justify-content:flex-start; overflow-y:auto; overscroll-behavior:contain; padding-right:6px; pointer-events:auto }
+.lab-rail.how-open > .lab-how { position:static; width:100%; margin-top:1.6em; padding:1em 1.15em 1.25em; background:rgba(255,255,255,.58); border:1px solid var(--line); border-radius:5px; flex:0 0 auto }
+.lab-night .lab-rail.how-open > .lab-how { background:rgba(255,255,255,.055) }
+.lab-rail.how-open .lab-how summary { position:sticky; top:0; z-index:1; background:var(--paper); padding-bottom:.45em }
+.lab-rail.how-open .lab-how .eq { white-space:normal }
 .lab-no { font-size:clamp(11px,0.95vw,18px); color:var(--mute); margin-bottom:0.3em }
 .lab-title { font-family:var(--serif); font-size:clamp(34px,3.9vw,76px); line-height:0.98; letter-spacing:-0.01em; font-weight:400 }
 .lab-title i { display:block; color:#6d6b66; font-style:italic }
 .lab-night .lab-title i { color:#a4a199 }
+/* CJK glyphs are visually denser: without this the Traditional Chinese title
+   and its italic sub-line grow tall enough to reach the pills row at the top. */
+@media (min-width:761px) {
+  html.lang-zh .lab-title { font-size:clamp(30px,3.2vw,62px); line-height:1.05 }
+  html.lang-zh .lab-title i { font-size:0.46em; line-height:1.3 }
+}
 .lab-metric { margin-top:clamp(18px,3.6vh,44px) }
 .lab-metric .lbl { font-size:clamp(12px,1.02vw,19px); color:var(--mute) } .lab-metric .lbl b { color:var(--ink); font-weight:500 }
 .lab-big { font-family:var(--serif); font-size:clamp(64px,7.4vw,142px); line-height:1.02; letter-spacing:-0.02em; font-variant-numeric:lining-nums tabular-nums; white-space:nowrap }
@@ -578,7 +741,7 @@ html,body { margin:0; height:100%; background:var(--paper); color:var(--ink); fo
 .lab-modes button.brk { color:var(--accent); border-color:rgba(228,87,46,0.35) } .lab-modes button.brk.act { background:var(--accent); color:#fff; border-color:var(--accent) }
 .lab-modes kbd { font:inherit; color:var(--faint); margin-left:0.45em; font-size:0.85em }
 .lab-modes button.act kbd { color:rgba(255,255,255,0.45) }
-.lab-how { position:absolute; right:4.2vw; bottom:4.2vh; width:clamp(250px,22.5vw,440px); font-size:clamp(11px,0.82vw,15px); color:var(--mute); line-height:1.5 }
+.lab-how { position:absolute; right:0; bottom:0; width:100%; font-size:clamp(11px,0.82vw,15px); color:var(--mute); line-height:1.5 }
 .lab-how summary { cursor:pointer; color:var(--ink); list-style:none; font-weight:500 } .lab-how summary::-webkit-details-marker { display:none } .lab-how summary::after { content:' +'; color:var(--faint) }
 .lab-how[open] summary::after { content:' \\2212' }
 .lab-how .eq { font-family:var(--mono); font-size:0.92em; color:#4d4b47; margin:0.5em 0; white-space:pre-wrap }
@@ -601,7 +764,8 @@ html,body { margin:0; height:100%; background:var(--paper); color:var(--ink); fo
 .lab-embed .lab-beat { display:none }
 .lab-hidden { opacity:0 !important }
 @media (max-width: 760px) {
-  .lab-side { top:auto; bottom:12vh; transform:none; right:16px; left:16px; width:auto }
+  .lab-rail { top:auto; bottom:12vh; left:16px; right:16px; width:auto; display:block }
+  .lab-rail > .lab-side { position:static; width:auto }
   .lab-prompt { left:16px; right:16px; max-width:none; top:16px }
   .lab-pills, .lab-how, .lab-scale { display:none }
   .lab-modes { left:16px; right:16px; bottom:16px }
@@ -675,20 +839,41 @@ export class Lab {
       <div class="lab-pills">${(o.pills ?? ['three.js', 'Physics', 'Film']).map((p) => `<span>${p}</span>`).join('')}</div>
       <div class="lab-side">
         <div class="lab-no">No. ${String(o.no ?? 1).padStart(2, '0')}</div>
-        <div class="lab-title">${o.title ?? 'Machine'}<i>${o.sub ?? ''}</i></div>
+        <div class="lab-title"><span class="t">${o.title ?? 'Machine'}</span><i>${o.sub ?? ''}</i></div>
         <div class="lab-metric"></div>
         <div class="lab-ctls"></div>
       </div>
       <div class="lab-scale"><span></span><div></div></div>
       <div class="lab-modes on"></div>
-      <details class="lab-how on"><summary>How it is computed</summary><div class="body"></div></details>
+      <details class="lab-how on"><summary>${trOr('howSummary', 'How it is computed')}</summary><div class="body"></div></details>
       <div class="lab-beat"><span class="n"></span><div><b></b> <span></span></div></div>
       <div class="lab-flash"></div>
       <div class="lab-cursor">${CURSOR_SVG}</div>`
     document.body.appendChild(ui)
     this.ui = ui
     this.$ = (s) => ui.querySelector(s)
+    // The readouts and "How it is computed" share one rail. Expanding the
+    // details used to grow upward over the title / hero number / slider;
+    // now the whole rail scrolls and jumps to the explanation instead.
+    const rail = document.createElement('div')
+    rail.className = 'lab-rail'
+    const side = ui.querySelector('.lab-side'), how = ui.querySelector('.lab-how')
+    side.parentNode.insertBefore(rail, side)
+    rail.appendChild(side)
+    rail.appendChild(how)
+    how.addEventListener('toggle', () => {
+      const open = how.open
+      rail.classList.toggle('how-open', open)
+      // Jump straight to the explanation. Reading offsetTop forces the new
+      // layout, so the jump is instant even on a slow GPU; re-apply next frame
+      // in case the browser settles the flex layout a tick later.
+      const jump = () => { rail.scrollTop = open ? Math.max(0, how.offsetTop - 8) : 0 }
+      jump()
+      requestAnimationFrame(jump)
+    })
     this.$('.lab-prompt .txt').textContent = o.prompt ?? ''
+    const summary = this.$('.lab-how summary')
+    onLang(() => { summary.textContent = trOr('howSummary', 'How it is computed') })
     if (this.embed && !this.filmMode) for (const s of ['.lab-modes', '.lab-how', '.lab-scale']) this.$(s).style.display = 'none'
     if (o.frame === 'center') this.$('.lab-side').style.display = 'none'
     // the primary metric block
@@ -736,12 +921,18 @@ export class Lab {
   }
 
   /** mode buttons; the break-it handler comes from lab.breakIt() */
+  _modeLabel(k) {
+    if (k === 'run') return this.paused ? trOr('modes.run', 'Run') : trOr('modes.pause', 'Pause')
+    const en = { explode: 'Explode', cut: 'Cut away', xray: 'X-ray', slow: 'Slow', labels: 'Labels', break: 'Break it' }
+    return trOr('modes.' + k, en[k] ?? k)
+  }
   _modes() {
     const m = this.$('.lab-modes')
-    const defs = [['run', 'Pause', 'Space'], ['explode', 'Explode', 'E'], ['cut', 'Cut away', 'C'], ['xray', 'X-ray', 'X'], ['slow', 'Slow', 'S'], ['labels', 'Labels', 'L']]
-    if (this._break) defs.push(['break', this._break.label ?? 'Break it', 'B'])
-    m.innerHTML = defs.map(([k, t, key]) => `<button data-k="${k}" class="${k === 'break' ? 'brk' : ''}">${t}<kbd>${key}</kbd></button>`).join('')
+    const defs = [['run', 'Space'], ['explode', 'E'], ['cut', 'C'], ['xray', 'X'], ['slow', 'S'], ['labels', 'L']]
+    if (this._break) defs.push(['break', 'B'])
+    m.innerHTML = defs.map(([k, key]) => `<button data-k="${k}" class="${k === 'break' ? 'brk' : ''}">${this._modeLabel(k)}<kbd>${key}</kbd></button>`).join('')
     m.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) this.toggle(b.dataset.k) })
+    onLang(() => { for (const b of m.querySelectorAll('button')) b.firstChild.textContent = this._modeLabel(b.dataset.k) })
     addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' && e.key !== ' ') return
       const k = { ' ': 'run', e: 'explode', c: 'cut', x: 'xray', s: 'slow', l: 'labels', b: 'break' }[e.key.toLowerCase()]
@@ -758,7 +949,7 @@ export class Lab {
     for (const b of this.ui.querySelectorAll('.lab-modes button')) {
       const k = b.dataset.k
       b.classList.toggle('act', k === 'run' ? !!this.paused : k === 'break' ? this.broken : this.target[k] > 0.5)
-      if (k === 'run') b.firstChild.textContent = this.paused ? 'Run' : 'Pause'
+      if (k === 'run') b.firstChild.textContent = this._modeLabel('run')
     }
   }
 
@@ -835,6 +1026,22 @@ export class Lab {
     this.renderer.setSize(w, h); this.composer.setSize(w, h)
     const s = this.renderer.getDrawingBufferSize(new THREE.Vector2())
     this.ao.setSize(s.x, s.y); this.grade.uniforms.uRes.value.set(s.x, s.y)
+    this._frame()
+  }
+  /**
+   * Frame offset. On desktop frameX pushes the machine left of the readout
+   * column. On phones those readouts become a bottom card, so the machine is
+   * centred (frameX 0) and lifted ~8% of the viewport (frameY) to stay clear
+   * of that card. Keeping this in one place also makes it survive the demo's
+   * per-frame setView() calls and window resizes.
+   */
+  _frame(v) {
+    const view = v || this.view || this.o?.view || {}
+    const narrow = innerWidth <= 760
+    const fx = narrow ? 0 : (view.frameX ?? 0)
+    const fy = narrow ? 0.085 : (view.frameY ?? 0)
+    this.camera.setViewOffset(innerWidth, innerHeight, -fx * innerWidth, fy * innerHeight, innerWidth, innerHeight)
+    this.camera.updateProjectionMatrix()
   }
   /**
    * Render quality. The scene is drawn several times per frame (contact shadow, VSM shadow,
@@ -864,7 +1071,7 @@ export class Lab {
     this.contactEvery = level === 'high' ? 1 : level === 'balanced' ? 2 : 6
     this.contactFrame = 0
     const b = document.getElementById('labQuality')
-    if (b) b.textContent = `Quality · ${level[0].toUpperCase() + level.slice(1)}${this._qualityAuto && !this.qualityExplicit ? ' (auto)' : ''}`
+    if (b) b.textContent = `${trOr('quality', 'Quality')} · ${trOr('quality.' + level, level[0].toUpperCase() + level.slice(1))}${this._qualityAuto && !this.qualityExplicit ? ' ' + trOr('autoShort', '(auto)') : ''}`
     return level
   }
 
@@ -917,8 +1124,8 @@ export class Lab {
     const d = v.dist * 2.4
     const az = THREE.MathUtils.degToRad(v.az), el = THREE.MathUtils.degToRad(v.el)
     this.camera.fov = v.fov ?? 30
-    // shift the frame so the subject sits left of the side column
-    this.camera.setViewOffset(innerWidth, innerHeight, -(v.frameX ?? 0) * innerWidth, 0, innerWidth, innerHeight)
+    // shift the frame so the subject sits left of the side column (or centred and lifted on phones)
+    this._frame(v)
     this.camera.position.set(t.x + d * Math.cos(el) * Math.sin(az), t.y + d * Math.sin(el), t.z + d * Math.cos(el) * Math.cos(az))
     this.controlsOrbit.target.copy(t)
     this.camera.lookAt(t)
@@ -1006,12 +1213,12 @@ export class Lab {
       for (const p of this.parts) { const ai = ease.out(clamp((1 - A) * 1.6 - (p.order / Math.max(1, this.parts.length)) * 0.6)); const c = p.count ?? 1; if (ai > 0.92) { n += p._c ?? (p._c = p.count ?? (() => { let k = 0; p.obj.traverse((m) => { if (m.isMesh && m.layers.mask & 1) k++ }); return Math.max(1, k) })()); cur = p.name || cur } void c }
       if (!this._building) { this._building = true; this._saveHero = this.metricEl.innerHTML }
       this._hs.textContent = cur
-      this.metricEl.querySelector('.lbl').firstChild.textContent = 'Building · '
+      this.metricEl.querySelector('.lbl').firstChild.textContent = trOr('building', 'Building · ')
       this._hv.textContent = fmt(n)
-      this.metricEl.querySelector('.lab-big i').textContent = `of ${fmt(N)} parts`
+      this.metricEl.querySelector('.lab-big i').textContent = trOr('buildCount', 'of {n} parts').replace('{n}', fmt(N))
       this._hb.firstElementChild.style.width = `${(n / N) * 100}%`
       this._hb.classList.remove('bad')
-      this._hsub.textContent = `${fmt(this.tris ?? 0)} triangles · ${this.matCount ?? 0} materials`
+      this._hsub.textContent = trOr('buildSub', '{t} triangles · {m} materials').replace('{t}', fmt(this.tris ?? 0)).replace('{m}', String(this.matCount ?? 0))
     } else if (this._building) {
       this._building = false
       this.metricEl.querySelector('.lbl').firstChild.textContent = `${this.heroO.label} · `
@@ -1561,14 +1768,14 @@ class Plume {
 }
 
 // ---------------------------------------------------------------- global handle for pages that paste the kit inline
-const LabKit = { THREE, Lab, MAT, mat, setCaps, GEO, heatGlow, blackbody, clamp, lerp, smoothstep, ease, approach, table, rk4, fmt, rng, LAYER_FX }
+const LabKit = { THREE, Lab, MAT, mat, setCaps, GEO, heatGlow, blackbody, clamp, lerp, smoothstep, ease, approach, table, rk4, fmt, rng, LAYER_FX, tr, trOr, getLang, onLang, setLang, applyI18n }
 if (typeof window !== 'undefined') window.LabKit = LabKit
 export default LabKit
 
 </script>
 <!-- lab-kit:end -->
 <script type="module">
-const { THREE, Lab, MAT, GEO, clamp, lerp, approach, fmt, ease } = window.LabKit
+const { THREE, Lab, MAT, GEO, clamp, lerp, approach, fmt, ease, tr, trOr, getLang, onLang, setLang, applyI18n } = window.LabKit
 // REAL BUILD (as-built re-render): Machine Skill runtime x Anatomy discipline, geometry
 // re-skinned from photographs of Matt's actual site unit (2026-11-07) and proved by
 // integrated/audit-real.mjs against integrated/parts-data-real.mjs. Same solver, same
@@ -1605,8 +1812,8 @@ const T2R = Math.PI / 2
 const LIQY = 0.62                      // sump liquor surface height (m)
 
 const lab = new Lab({
-  prompt: 'the real horizontal cross-flow scrubber',
-  no: 5, title: 'Cross-flow scrubber', sub: 'horizontal · as built — site unit',
+  prompt: tr('prompt'),
+  no: 5, title: tr('title'), sub: tr('sub'),
   size: 10.6, ground: 0,
   view: { az: 38, el: 10, dist: 3.1, target: [0, 1.9, 0.3], fov: 35 },
   cut: { a: [0, 0, 1], b: [0, 1, 0], center: [0, 1.75, 0], reach: 0.8 },
@@ -2264,8 +2471,8 @@ function solve(frac, liqScale) {
   return { eta, Cout, uG, QL, dP, aw, Tw, SO2kg, NaOH, Qp, Pp, NTU: NTUstage * 4 }
 }
 
-lab.hero({ label: 'SO₂ removal', unit: '%', max: 100, digits: 1 })
-const load = lab.slider({ id: 'load', label: 'Gas load', min: 40, max: 110, step: 0.1, value: 100, unit: '%', ends: ['Turndown', 'Overload'] })
+lab.hero({ label: tr('heroLabel'), unit: '%', max: 100, digits: 1 })
+const load = lab.slider({ id: 'load', label: tr('gasLoad'), min: 40, max: 110, step: 0.1, value: 100, unit: '%', ends: [tr('turndown'), tr('overload')] })
 
 lab.onTick((dt) => {
   const frac = load.value / 100
@@ -2278,13 +2485,13 @@ lab.onTick((dt) => {
   curtainM.opacity = 0.03 + 0.23 * S.liq; curtainCoreM.opacity = 0.02 + 0.14 * S.liq
   S.pH = lerp(S.pH, 6.1 + 2.4 * S.liq, k); S.pHout = lerp(S.pHout, 5.6 + 1.4 * S.liq, k); S.ORP = lerp(S.ORP, 40 + 280 * S.liq, k)
   sump.position.y = (LIQY - 0.15) - (1 - S.liq) * 0.1
-  const state = S.broken ? 'pump tripped' : S.Cout > 150 ? 'breaking through' : S.eta > 0.97 ? 'in compliance' : 'absorbing'
-  lab.setHero(S.eta * 100, { state, bad: S.broken || S.Cout > 150, sub: `SO₂ out ${fmt(S.Cout)} ppmv · gas ${fmt(S.Qn)} Nm³/h · liquor ${fmt(t.QL * 3600, 1)} m³/h · ΔP ${fmt(t.dP)} Pa · sump ${fmt(t.Tw)} °C · NaOH ${fmt(t.NaOH)} kg/h` })
+  const state = S.broken ? tr('state.pumpTripped') : S.Cout > 150 ? tr('state.breakingThrough') : S.eta > 0.97 ? tr('state.inCompliance') : tr('state.absorbing')
+  lab.setHero(S.eta * 100, { state, bad: S.broken || S.Cout > 150, sub: `${tr('so2out')} ${fmt(S.Cout)} ppmv · ${tr('gas')} ${fmt(S.Qn)} Nm³/h · ${tr('liquor')} ${fmt(t.QL * 3600, 1)} m³/h · ΔP ${fmt(t.dP)} Pa · ${tr('sump')} ${fmt(t.Tw)} °C · NaOH ${fmt(t.NaOH)} kg/h` })
 })
 
 // ------------------------------------------------------------------ break it: the recirc pump trips
 lab.breakIt({
-  label: 'Trip the pump',
+  label: tr('modes.break'),
   run() {
     S.broken = true
     const iv = setInterval(() => { S.liq = Math.max(0.05, S.liq * 0.8); if (S.liq <= 0.051) clearInterval(iv) }, 90)
@@ -2296,12 +2503,13 @@ lab.breakIt({
   },
 })
 
-lab.how(
-  'The as-built site unit, modelled from photographs of the real machine — grey bolted FRP panels, a continuous sump skirt, a tapered outlet transition and a centrifugal ID fan — sized the way a process engineer sizes one. The gas stays near floor level and crosses the liquor-wetted pads sideways, so the vessel is long and low instead of tall — the layout you pick when headroom is tight. The 20,000 Nm³/h of 150 °C gas is quenched to its adiabatic saturation temperature in the inlet spray zone (psychrometric balance, Tetens vapour pressure, bisection: about 43 °C). Under each spray bar hangs a water curtain — a continuous falling liquor sheet — and it then crosses four 0.6 m packing stages in series: each stage removes a fraction of what reaches it, so removal compounds stage by stage, η = 1 − Π(1 − η<sub>stage</sub>), with NTU per stage = K<sub>G</sub>a·t/u<sub>G</sub> over the 0.6 m thickness. K<sub>G</sub>a is anchored to published caustic-scrubber values for 50 mm Pall rings (≈2.6 s<sup>−1</sup>) and scaled each frame with gas rate, Onda wetted area, liquor rate and wetting state. Pressure drop is the Eckert generalised correlation per unit depth over the full 2.4 m of pad, plus quench and demister allowances — cross-flow keeps face velocity low, so the total lands near the tower’s despite the longer path. Purification is two-chemical (on the real unit the dosing skid — two vertical dosing pumps with a bunded day tank — stands at the inlet end, as modelled): the alkaline dose (NaOH) is stoichiometric ×1.15 on absorbed SO₂, and a dilute acid trim (H₂SO₄) at the outlet end neutralises alkaline carry-over, bringing the spent liquor back toward pH 7; pump power is ρgQH/η at 52 m³/h and 18 m. Instrumentation: pH transmitters watch the alkaline sump (target 8.5) and the acid-trimmed outlet (target pH 7), and an ORP transmitter tracks oxidation of absorbed sulphite to sulphate (about +320 mV in service); all three readings sag when the liquor stagnates after a pump trip, which is how the operator sees the failure before breakthrough. Simplified: plug flow across the pads, constant pH, uniform spray distribution, no SO₃ or fly-ash load.',
-  ['T<sub>sat</sub>: c<sub>p</sub>(T<sub>in</sub> − T<sub>sat</sub>) = λ(Y<sub>sat</sub> − Y<sub>in</sub>)', 'ΔP = C<sub>f</sub>·ρ<sub>G</sub>u<sub>G</sub>²/2 · a<sub>p</sub>/ε³ · L  (Eckert, L = total pad depth)', 'a<sub>w</sub>/a<sub>p</sub> = 1 − exp(−1.45(σ<sub>c</sub>/σ)<sup>0.75</sup> Re<sub>L</sub><sup>0.1</sup> Fr<sub>L</sub><sup>−0.05</sup> We<sub>L</sub><sup>0.2</sup>)  (Onda)', 'η = 1 − Π<sub>stages</sub> e<sup>−NTU<sub>s</sub></sup>,  NTU<sub>s</sub> = K<sub>G</sub>a·t/u<sub>G</sub>'],
-)
+const HOW_EQS = ['T<sub>sat</sub>: c<sub>p</sub>(T<sub>in</sub> − T<sub>sat</sub>) = λ(Y<sub>sat</sub> − Y<sub>in</sub>)', 'ΔP = C<sub>f</sub>·ρ<sub>G</sub>u<sub>G</sub>²/2 · a<sub>p</sub>/ε³ · L  (Eckert, L = total pad depth)', 'a<sub>w</sub>/a<sub>p</sub> = 1 − exp(−1.45(σ<sub>c</sub>/σ)<sup>0.75</sup> Re<sub>L</sub><sup>0.1</sup> Fr<sub>L</sub><sup>−0.05</sup> We<sub>L</sub><sup>0.2</sup>)  (Onda)', 'η = 1 − Π<sub>stages</sub> e<sup>−NTU<sub>s</sub></sup>,  NTU<sub>s</sub> = K<sub>G</sub>a·t/u<sub>G</sub>']
+lab.how(tr('howBody'), HOW_EQS)
 
-lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four caustic-wetted pads sideways; removal compounds stage by stage.', breakBeat: 'Trip the pump.', breakSub: 'The pads dry out: SO₂ breaks through in seconds.', sliderTo: 1 })
+function paintFilm() {
+  lab.autoFilm({ runBeat: tr('film.runBeat'), runSub: tr('film.runSub'), breakBeat: tr('film.breakBeat'), breakSub: tr('film.breakSub'), sliderTo: 1 })
+}
+paintFilm()
 
 // ------------------------------------------------------------------ guided demo, quality switch, manual link
 // Everything here is page-level UI layered on top of the kit; it never touches the solver.
@@ -2313,33 +2521,54 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
 .lab-tools button:hover, .lab-tools a:hover { border-color:var(--faint) }
 .lab-tools button.primary { background:var(--ink); color:var(--paper); border-color:var(--ink) }
 .lab-tools button.primary:hover { opacity:.82 }
+.lab-tools button.act { background:var(--ink); color:var(--paper); border-color:var(--ink) }
 .lab-tools #labDemoReset { padding:0.5em 0.8em }
-.lab-demo { position:absolute; left:46%; bottom:calc(4.2vh + 3.4em); width:min(52vw,720px); padding:0.9em 1.4em 1em; background:rgba(243,242,238,0.9); border:1px solid var(--line); border-radius:5px; box-shadow:0 8px 34px rgba(30,28,24,0.09); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px); transform:translateX(-50%) translateY(8px); opacity:0; transition:opacity .35s, transform .35s; text-align:center; pointer-events:none }
-.lab-demo.show { opacity:1; transform:translateX(-50%) translateY(0) }
+.lab-lang { display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; overflow:hidden; flex:0 0 auto }
+.lab-lang button { border:0; border-radius:0; padding:0.5em 0.7em; background:transparent; font-family:var(--mono); font-size:0.9em; letter-spacing:.02em }
+.lab-lang button + button { border-left:1px solid var(--line) }
+.lab-lang button.act { background:var(--ink); color:var(--paper) }
+/* Wide, shallow caption band: starts at the Pause toggle (left:4.2vw) and
+   stops just short of the right-hand text column. Sits above the scale bar. */
+.lab-demo { position:absolute; left:4.2vw; right:calc(5.8vw + clamp(250px,22.5vw,440px)); bottom:calc(4.2vh + 5.8em); width:auto; padding:0.5em 1.3em 0.6em; background:rgba(243,242,238,0.9); border:1px solid var(--line); border-radius:5px; box-shadow:0 8px 34px rgba(30,28,24,0.09); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px); transform:translateY(8px); opacity:0; transition:opacity .35s, transform .35s; text-align:center; pointer-events:none }
+.lab-demo.show { opacity:1; transform:translateY(0) }
 .lab-night .lab-demo { background:rgba(13,14,16,0.88) }
-.lab-demo-meta { display:flex; justify-content:space-between; font-family:var(--mono); font-size:clamp(10px,0.78vw,13px); color:var(--mute); letter-spacing:.06em; margin-bottom:.65em }
-.lab-demo-sub { font-family:var(--serif); font-size:clamp(20px,2.1vw,38px); line-height:1.15; letter-spacing:-.01em }
+.lab-demo-meta { display:flex; justify-content:space-between; font-family:var(--mono); font-size:clamp(10px,0.72vw,12px); color:var(--mute); letter-spacing:.06em; margin-bottom:.35em }
+.lab-demo-sub { font-family:var(--serif); font-size:clamp(18px,1.5vw,27px); line-height:1.1; letter-spacing:-.01em }
 .lab-demo-sub b { font-weight:400; display:block }
-.lab-demo-sub span { display:block; font-family:var(--sans); font-size:.46em; color:#585650; line-height:1.5; margin-top:.6em; letter-spacing:0 }
-.lab-demo-bar { height:2px; background:var(--line); margin-top:1.1em }
+.lab-demo-sub span { display:block; font-family:var(--sans); font-size:.54em; color:#585650; line-height:1.4; margin:.3em auto 0; letter-spacing:0 }
+.lab-demo-bar { height:2px; background:var(--line); margin-top:.7em }
 .lab-demo-bar > div { height:100%; width:0; background:var(--ink) }
 .lab-night .lab-demo-sub span { color:#b0ada5 }
+/* The caption plate ignores pointer events so the 3D orbit still works;
+   only the close button opts back in. Escape does the same thing. */
+.lab-demo-close { pointer-events:auto; font:inherit; font-size:1em; letter-spacing:.02em; color:var(--ink); background:rgba(255,255,255,.55); border:1px solid var(--faint); border-radius:999px; padding:.15em .7em; min-height:22px; line-height:1.35; cursor:pointer; white-space:nowrap }
+.lab-demo-close:hover, .lab-demo-close:focus-visible { border-color:var(--ink); outline:none }
+.lab-night .lab-demo-close { color:#f1efe9; background:rgba(255,255,255,.08); border-color:#555 }
 .lab-film .lab-tools, .lab-film .lab-demo, .lab-embed .lab-tools { display:none }
-@media (max-width:760px) { .lab-tools { left:16px; right:16px; top:88px } .lab-demo { left:50%; width:calc(100% - 32px); bottom:96px; padding:0.75em 1em } }
 `
   document.head.appendChild(css)
 
   const tools = document.createElement('div')
   tools.className = 'lab-tools on'
-  tools.innerHTML = '<button id="labDemo" class="primary" title="Play the guided tour (D)">&#9654; Play demo</button>' +
-    '<button id="labDemoReset" title="Restart the demo">&#8635;</button>' +
-    '<button id="labQuality" title="Cycle render quality (Q)">Quality · High</button>' +
-    '<a href="crossflow-scrubber-manual.html" target="_blank" rel="noopener" title="Open the control manual">Manual &#8599;</a>'
+  tools.innerHTML = '<button id="labDemo" class="primary" data-i18n-title="toolPlay">&#9654; <span class="lab-demo-label">Play demo</span></button>' +
+    '<button id="labDemoReset" data-i18n-title="toolRestart" data-i18n-aria="toolRestart" title="Restart the demo">&#8635;</button>' +
+    '<button id="labQuality" data-i18n-title="toolQuality">Quality · High</button>' +
+    '<button id="lab2D" data-i18n-title="tool2d">2D view</button>' +
+    '<button id="labPID" data-i18n-title="toolPid">P&amp;I</button>' +
+    '<span class="lab-lang" role="group" aria-label="Language" data-i18n-aria="toolLang" data-i18n-title="toolLang"><button data-lang="en" class="act">EN</button><button data-lang="zh">繁中</button></span>' +
+    '<a href="crossflow-scrubber-manual.html" target="_blank" rel="noopener" data-i18n-title="toolManual"><span data-i18n="manual">Manual</span> &#8599;</a>'
   lab.ui.appendChild(tools)
+
+  // The language control is a two-button segmented pill; the active half follows
+  // the persisted preference, and either half calls the shared setLang().
+  const langBtns = [...tools.querySelectorAll('.lab-lang button')]
+  for (const b of langBtns) b.addEventListener('click', () => setLang(b.dataset.lang))
+  onLang((l) => { for (const b of langBtns) b.classList.toggle('act', b.dataset.lang === l) })
 
   const panel = document.createElement('div')
   panel.className = 'lab-demo'
-  panel.innerHTML = '<div class="lab-demo-meta"><span class="n">01 / 07</span><span class="t">0:00 / 0:00</span></div>' +
+  panel.innerHTML = '<div class="lab-demo-meta"><span class="n">01 / 07</span><span class="t">0:00 / 0:00</span>' +
+    '<button type="button" class="lab-demo-close" data-i18n-title="toolCloseDemo" data-i18n-aria="toolCloseDemo" aria-label="Close demo">&#215; <span data-i18n="closeDemo">Close demo</span></button></div>' +
     '<div class="lab-demo-sub"><b></b><span></span></div>' +
     '<div class="lab-demo-bar"><div></div></div>'
   lab.ui.appendChild(panel)
@@ -2348,37 +2577,34 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
   const playBtn = tools.querySelector('#labDemo')
   const resetBtn = tools.querySelector('#labDemoReset')
   const qualityBtn = tools.querySelector('#labQuality')
-  qualityBtn.textContent = 'Quality · ' + lab.quality[0].toUpperCase() + lab.quality.slice(1)
+  function paintQuality() { qualityBtn.textContent = tr('quality') + ' · ' + tr('quality.' + lab.quality) + (lab._qualityAuto && !lab.qualityExplicit ? ' ' + tr('autoShort') : '') }
+  paintQuality()
+  onLang(paintQuality)
 
   // camera keys: az/el in degrees, dist in multiples of the machine's display size
   const V = (az, el, dist, target, fov) => ({ az, el, dist, target, fov, frameX: -0.16 })
+  // Subtitles live in the i18n dictionary; the chapters only carry timing,
+  // camera keys and mode changes, so a language switch repaints them in place.
   const CH = [
-    { dur: 6, n: '01', title: 'The as-built machine',
-      text: 'A horizontal cross-flow wet scrubber: 7.2 m of bolted FRP vessel, a continuous sump skirt and an ID fan. 38,589 parts, 1.24 million triangles.',
+    { dur: 6, n: '01',
       view: V(38, 12, 3.1, [0, 1.9, 0.3], 35),
       enter: () => { if (lab.broken) lab.resetBreak(); load.set(100) } },
-    { dur: 6, n: '02', title: 'Dirty gas enters',
-      text: '20,000 Nm³/h of gas at 150 °C enters the left duct. The inlet spray quenches it to its adiabatic saturation temperature, about 43 °C.',
+    { dur: 6, n: '02',
       view: V(-48, 9, 2.45, [-2.7, 2.0, 0.2], 34), set: {} },
-    { dur: 7, n: '03', title: 'Cross-flow contact',
-      text: 'Cut away the shell: four 0.6 m packing stages. Alkaline liquor rains down from the roof headers while the gas crosses sideways.',
+    { dur: 7, n: '03',
       view: V(30, 14, 2.5, [-0.3, 2.0, 0.3], 33), set: { cut: 1, labels: 1 } },
-    { dur: 6, n: '04', title: 'Removal compounds stage by stage',
-      text: 'Each pad removes a fraction of what reaches it: η = 1 − Π(1 − ηstage). Watch the SO₂ removal figure settle near 97.5 %.',
+    { dur: 6, n: '04',
       view: V(8, 6, 2.2, [0.2, 2.1, 0.3], 32), set: { xray: 1 } },
-    { dur: 7, n: '05', title: 'Change the gas load',
-      text: 'The solver re-runs every frame: psychrometric quench, Onda wetted area, Eckert pressure drop and four-stage mass transfer. The numbers are live, not canned.',
+    { dur: 7, n: '05',
       view: V(30, 10, 2.85, [0, 1.9, 0.3], 35), set: { xray: 0 },
       frame: (u) => {
         const seg = (a, b, x, y) => lerp(x, y, ease.io(clamp((u - a) / (b - a))))
         load.set(u < 0.34 ? seg(0, 0.34, 100, 45) : u < 0.7 ? seg(0.34, 0.7, 45, 110) : seg(0.7, 1, 110, 100))
       } },
-    { dur: 7, n: '06', title: 'Trip the recirculation pump',
-      text: 'Now break it. The liquor stops, the pads dry out and SO₂ breaks through within seconds — the pH, ORP and outlet readings all sag first.',
+    { dur: 7, n: '06',
       view: V(66, 12, 2.4, [-0.4, 1.35, 1.1], 33),
       enter: () => { load.set(100); if (!lab.broken) lab.breakNow() } },
-    { dur: 5, n: '07', title: 'Restore and explore',
-      text: 'The pump comes back and the liquor recovers. Everything on this page is driven by the same physics solver — take over with the controls below.',
+    { dur: 5, n: '07',
       view: V(38, 11, 3.0, [0, 1.9, 0.3], 35),
       enter: () => { if (lab.broken) lab.resetBreak(); load.set(100) } },
   ]
@@ -2391,6 +2617,13 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
 
   const D = { active: false, playing: false, t: 0, i: -1, cur: null, from: null, to: null, transT: 0, saved: null }
 
+  function paintChapter() {
+    if (D.i < 0) return
+    const c = CH[D.i], k = Number(c.n)
+    $('.lab-demo-sub b').textContent = tr('ch' + k + 'Title')
+    $('.lab-demo-sub span').textContent = tr('ch' + k + 'Text')
+  }
+  onLang(paintChapter)
   function enterChapter(i) {
     D.i = i
     const c = CH[i]
@@ -2399,10 +2632,20 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
     D.transT = D.t
     for (const k of MODES) lab.toggle(k, c.set?.[k] ?? 0)
     c.enter?.()
-    $('.lab-demo-sub b').textContent = c.title
-    $('.lab-demo-sub span').textContent = c.text
+    paintChapter()
     $('.lab-demo-meta .n').textContent = c.n + ' / ' + String(CH.length).padStart(2, '0')
   }
+
+  // The play button doubles as pause / resume; keep its glyph and label in sync
+  // in one place so a language change cannot leave a stale English caption.
+  const demoLabel = playBtn.querySelector('.lab-demo-label')
+  function paintPlay() {
+    const label = !D.active ? tr('playDemo') : D.playing ? tr('pauseDemo') : tr('resumeDemo')
+    playBtn.firstChild.textContent = (!D.active || !D.playing) ? '▶ ' : '❚❚ '
+    demoLabel.textContent = label
+    playBtn.classList.toggle('primary', !D.active || !D.playing)
+  }
+  onLang(paintPlay)
 
   function restore() {
     if (!D.saved) return
@@ -2422,12 +2665,12 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
     D.active = false; D.playing = false; D.t = 0; D.i = -1
     restore()
     panel.classList.remove('show')
-    playBtn.innerHTML = '&#9654; Play demo'
-    playBtn.classList.add('primary')
+    paintPlay()
   }
 
   function start() {
     if (D.active) stop()
+    window.__view?.set('3d')           // the tour needs the 3D camera (also leaves P&I)
     D.saved = {
       view: cloneView(lab.view), targets: { ...lab.target }, load: load.value,
       broken: lab.broken, paused: lab.paused, filmMode: lab.filmMode,
@@ -2439,8 +2682,7 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
     lab.paused = false
     lab._syncButtons()
     panel.classList.add('show')
-    playBtn.innerHTML = '&#10074;&#10074; Pause demo'
-    playBtn.classList.remove('primary')
+    paintPlay()
     enterChapter(0)
   }
 
@@ -2448,15 +2690,13 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
     D.playing = false
     lab.paused = true
     lab._syncButtons()
-    playBtn.innerHTML = '&#9654; Resume demo'
-    playBtn.classList.add('primary')
+    paintPlay()
   }
   function resume() {
     D.playing = true
     lab.paused = false
     lab._syncButtons()
-    playBtn.innerHTML = '&#10074;&#10074; Pause demo'
-    playBtn.classList.remove('primary')
+    paintPlay()
   }
   const toggle = () => !D.active ? start() : D.playing ? pause() : resume()
 
@@ -2478,6 +2718,9 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
 
   playBtn.addEventListener('click', toggle)
   resetBtn.addEventListener('click', () => { stop(); start() })
+  // Close in the middle: the caption's × button (and Escape) ends the tour,
+  // restores the saved camera / slider / mode state and returns to manual control.
+  panel.querySelector('.lab-demo-close').addEventListener('click', () => stop())
   const QUALITY = ['high', 'balanced', 'lite']
   const cycleQuality = () => {
     lab.qualityExplicit = true
@@ -2490,520 +2733,527 @@ lab.autoFilm({ runBeat: 'It runs on real chemistry.', runSub: 'Gas crosses four 
     const k = e.key.toLowerCase()
     if (k === 'd') { e.preventDefault(); toggle() }
     if (k === 'q') { e.preventDefault(); cycleQuality() }
+    if (k === 'g') { e.preventDefault(); setLang(getLang() === 'en' ? 'zh' : 'en') }
+    if (k === 'escape' && D.active) { e.preventDefault(); stop() }
   })
-  window.__demo = { start, stop, toggle, pause, resume, get state() { return { ...D } } }
+  window.__demo = { start, stop, toggle, pause, resume, get state() { return { ...D } }, paintPlay }
 }
 
-
-// ------------------------------------------------------------------ 2D P&ID + 1 Hz CSV Telemetry Historian (styled in Machine Skill editorial paper/ink aesthetic)
+// ------------------------------------------------------------------ view manager
+// Three mutually exclusive views: the 3D model, the 2D side elevation and the
+// P&I diagram. Panels register here; the manager owns the toolbar state, the
+// keyboard shortcuts and the single WebGL render bypass.
 {
-  const extraCss = document.createElement('style')
-  extraCss.textContent = `
-.lab-tools button.csv-btn { border-color:rgba(20,20,20,0.28) }
-.lab-tools .badge-pill { display:inline-block; font-family:var(--mono); font-size:0.82em; padding:0.08em 0.48em; margin-left:0.35em; border-radius:999px; background:rgba(20,20,20,0.08); color:var(--ink) }
-.lab-night .lab-tools .badge-pill { background:rgba(255,255,255,0.12) }
-.lab-rec-dot { display:inline-block; width:0.52em; height:0.52em; border-radius:50%; background:#1f7a4c; margin-right:0.4em; vertical-align:0.06em; animation:labrec 1.3s ease-in-out infinite }
-.lab-rec-dot.paused { background:#b45309; animation:none }
-.lab-rec-dot.bad { background:var(--accent) }
-@keyframes labrec { 0%,100%{ opacity:1 } 50%{ opacity:0.28 } }
-
-/* Editorial Drawer / Modal shared styling */
-.lab-drawer-backdrop { position:fixed; inset:0; background:rgba(20,20,18,0.24); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; z-index:30; padding:2.5vw }
-.lab-drawer-backdrop.open { display:flex }
-.lab-modal-card { width:min(1120px, 95vw); max-height:90vh; background:var(--paper); color:var(--ink); border:1px solid var(--faint); border-radius:6px; box-shadow:0 20px 60px rgba(20,18,14,0.18); display:flex; flex-direction:column; overflow:hidden }
-.lab-modal-head { display:flex; justify-content:space-between; align-items:baseline; padding:1.1em 1.5em 0.9em; border-bottom:1px solid var(--line); gap:1em; flex-wrap:wrap }
-.lab-modal-head .kicker { font-family:var(--mono); font-size:clamp(10px,0.78vw,13px); color:var(--mute); text-transform:uppercase; letter-spacing:0.06em }
-.lab-modal-head h2 { font-family:var(--serif); font-weight:400; font-size:clamp(22px,2.1vw,34px); line-height:1.05; letter-spacing:-0.01em; margin:0.1em 0 0 }
-.lab-modal-head h2 i { color:#6d6b66; font-style:italic; font-size:0.88em; margin-left:0.25em }
-.lab-modal-actions { display:flex; gap:0.45em; align-items:center; flex-wrap:wrap; font-size:clamp(11px,0.85vw,15px) }
-.lab-modal-actions button { font:inherit; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:999px; padding:0.45em 1em; cursor:pointer; transition:all .2s }
-.lab-modal-actions button:hover { border-color:var(--ink) }
-.lab-modal-actions button.primary { background:var(--ink); color:var(--paper); border-color:var(--ink) }
-.lab-modal-actions button.brk { color:var(--accent); border-color:rgba(228,87,46,0.4) }
-.lab-modal-actions button.brk.act { background:var(--accent); color:#fff; border-color:var(--accent) }
-.lab-modal-body { padding:1.1em 1.5em; overflow-y:auto; background:
-  linear-gradient(rgba(20,20,20,0.03) 1px, transparent 1px),
-  linear-gradient(90deg, rgba(20,20,20,0.03) 1px, transparent 1px);
-  background-size:22px 22px }
-.lab-modal-foot { display:flex; justify-content:space-between; align-items:center; padding:0.75em 1.5em; border-top:1px solid var(--line); font-family:var(--mono); font-size:clamp(10px,0.78vw,13px); color:var(--mute); flex-wrap:wrap; gap:0.8em }
-.lab-pid-legend { display:flex; gap:1.2em; align-items:center; flex-wrap:wrap }
-.lab-pid-legend span { display:inline-flex; align-items:center; gap:0.45em }
-.lab-pid-swatch { width:14px; height:2.5px; display:inline-block }
-.pid-flow-line { stroke-dasharray:8 6; animation:labPidFlow 0.9s linear infinite }
-.pid-flow-line.stopped { stroke-dasharray:none; animation:none; opacity:0.22 }
-@keyframes labPidFlow { to { stroke-dashoffset:-28 } }
-
-/* Floating Historian Drawer (Bottom Left above modes) */
-.lab-hist-drawer { position:fixed; left:4.2vw; bottom:calc(4.2vh + 3.6em); width:min(760px, calc(100vw - 8.4vw)); background:rgba(243,242,238,0.95); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid var(--faint); border-radius:6px; box-shadow:0 14px 42px rgba(20,18,14,0.14); padding:0.95em 1.2em; z-index:22; display:none }
-.lab-night .lab-hist-drawer { background:rgba(18,19,22,0.94) }
-.lab-hist-drawer.open { display:block }
-.lab-hist-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--line); padding-bottom:0.6em; margin-bottom:0.65em; gap:0.8em; flex-wrap:wrap }
-.lab-hist-title { font-family:var(--serif); font-size:clamp(18px,1.5vw,26px); font-weight:400 }
-.lab-hist-title small { font-family:var(--mono); font-size:0.5em; color:var(--mute); margin-left:0.6em; letter-spacing:0.04em }
-.lab-hist-table-wrap { max-height:210px; overflow-y:auto; border:1px solid var(--line); border-radius:4px; background:rgba(255,255,255,0.45) }
-.lab-night .lab-hist-table-wrap { background:rgba(0,0,0,0.3) }
-table.lab-hist-table { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:clamp(10px,0.78vw,12.5px); text-align:right; font-variant-numeric:tabular-nums }
-table.lab-hist-table th { position:sticky; top:0; background:var(--paper); color:var(--mute); font-weight:500; padding:0.48em 0.65em; border-bottom:1px solid var(--line) }
-table.lab-hist-table th:first-child, table.lab-hist-table td:first-child { text-align:left }
-table.lab-hist-table td { padding:0.42em 0.65em; border-bottom:1px solid var(--line); color:var(--ink) }
-table.lab-hist-table tr.bad-row td { color:var(--accent); background:rgba(228,87,46,0.07) }
+  const css = document.createElement('style')
+  css.textContent = `
+/* Width of the right-hand readout column; the flat drawings are capped so
+   they can never slide underneath it on a narrow desktop window. */
+:root { --railw: clamp(250px,22.5vw,440px) }
+.lab-pid { position:absolute; inset:0; background:var(--paper); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; pointer-events:none; z-index:0 }
+.lab-pid.on { opacity:1; visibility:visible }
+/* Top-anchored with a reserved band: the old vertically-centred drawing put
+   its title / HUD straight under the toolbar toggles. 8em of clearance keeps
+   the header below that row, and the vh cap keeps the legend above the modes. */
+.lab-pid > svg { position:absolute; left:4.2vw; top:calc(4.2vh + 8em); transform:none; width:min(66vw,1000px,124vh,calc(100vw - 8.4vw - var(--railw,22.5vw) - 1.4em)); height:auto; overflow:visible }
+.lab-pid .proc { fill:none; stroke:var(--ink); stroke-width:2.1; stroke-linejoin:round; stroke-linecap:round }
+.lab-pid .sig { fill:none; stroke:#8b6fb0; stroke-width:1.5; stroke-dasharray:6 5 }
+.lab-pid .thin { fill:none; stroke:var(--mute); stroke-width:1.1 }
+.lab-pid .unit { fill:var(--paper); stroke:var(--ink); stroke-width:1.9 }
+.lab-pid .bub { fill:var(--paper); stroke:var(--ink); stroke-width:1.7 }
+.lab-pid .valve { fill:var(--paper); stroke:var(--ink); stroke-width:1.7 }
+.lab-pid .blue { fill:rgba(47,111,176,.18); stroke:#2f6fb0; stroke-width:1.3 }
+/* Opaque label wells are painted over the line work, so a process / signal
+   line can never strike through a caption. */
+.lab-pid .well { fill:var(--paper) }
+.lab-pid .chip { fill:var(--paper); stroke:var(--mute); stroke-width:1 }
+.lab-pid .hot { fill:none; stroke:#e4572e; stroke-width:2.6; stroke-dasharray:10 6; animation:f2dgas 1.5s linear infinite }
+.lab-pid .liq { fill:none; stroke:#2f6fb0; stroke-width:2; stroke-dasharray:5 8; animation:f2dliq 1.1s linear infinite }
+.lab-pid.frozen .hot, .lab-pid.frozen .liq { animation-play-state:paused }
+.lab-pid.dry .liq { animation-play-state:paused; opacity:.12 }
+.lab-pid text { font-family:var(--mono); font-size:15px; fill:var(--mute); letter-spacing:.02em }
+.lab-pid text.h1 { font-family:var(--sans); font-size:24px; font-weight:600; fill:var(--ink); letter-spacing:.01em }
+.lab-pid text.h2 { font-size:17px; fill:var(--ink) }
+.lab-pid text.cap { font-size:15px; fill:var(--ink) }
+.lab-pid text.sch { font-size:14px; fill:var(--ink) }
+.lab-pid text.tag { font-size:12px; fill:var(--ink) }
+.lab-pid .panhint { display:none }
 `
-  document.head.appendChild(extraCss)
+  document.head.appendChild(css)
 
-  // Add P&ID, Historian, and Export CSV buttons into the existing .lab-tools bar
-  const toolsBar = lab.ui.querySelector('.lab-tools')
-  const pidBtn = document.createElement('button')
-  pidBtn.id = 'labPidBtn'
-  pidBtn.title = 'Open 2D Process & Instrumentation Diagram (P)'
-  pidBtn.innerHTML = 'P&amp;ID <kbd style="color:var(--faint);font-size:0.85em;margin-left:0.3em">P</kbd>'
+  const V = { mode: '3d', panels: {}, paints: {} }
+  const b2 = document.getElementById('lab2D')
+  const bP = document.getElementById('labPID')
 
-  const histBtn = document.createElement('button')
-  histBtn.id = 'labHistBtn'
-  histBtn.title = 'Toggle 1 Hz Live Telemetry Historian (H)'
-  histBtn.innerHTML = '<span class="lab-rec-dot" id="labRecDot"></span>Historian <span class="badge-pill" id="labHistCount">0</span>'
-
-  const csvBtn = document.createElement('button')
-  csvBtn.id = 'labCsvBtn'
-  csvBtn.className = 'csv-btn'
-  csvBtn.title = 'Export recorded process telemetry to CSV'
-  csvBtn.innerHTML = '&#8595; CSV'
-
-  toolsBar.appendChild(pidBtn)
-  toolsBar.appendChild(histBtn)
-  toolsBar.appendChild(csvBtn)
-
-  // Also update the top-right pills to show P&ID + CSV Historian alongside three.js / Physics / Film
-  const pillsBar = lab.ui.querySelector('.lab-pills')
-  if (pillsBar) {
-    pillsBar.innerHTML = '<span>three.js</span><span>Physics</span><span>2D P&amp;ID</span><span>CSV Historian</span>'
+  function setMode(m) {
+    if (m !== '3d' && m !== '2d' && m !== 'pid') m = '3d'
+    V.mode = m
+    for (const k of ['2d', 'pid']) V.panels[k]?.classList.toggle('on', m === k)
+    const root = document.documentElement
+    root.classList.toggle('flatview', m !== '3d')
+    root.classList.toggle('flat2d', m === '2d')
+    root.classList.toggle('pidview', m === 'pid')
+    b2.classList.toggle('act', m === '2d')
+    bP.classList.toggle('act', m === 'pid')
+    b2.textContent = m === '2d' ? tr('view3d') : tr('view2d')
+    b2.title = m === '2d' ? tr('tool3d') : tr('tool2d')
+    bP.textContent = tr('viewpid')
+    bP.title = m === 'pid' ? tr('toolPidOff') : tr('toolPid')
+    lab._userAt = performance.now()          // suppress the idle auto-orbit
+    if (m !== '3d') V.paints[m]?.()
+    return m
   }
-
-  // Create the Editorial 2D P&ID Modal
-  const pidModal = document.createElement('div')
-  pidModal.className = 'lab-drawer-backdrop on'
-  pidModal.id = 'labPidModal'
-  pidModal.innerHTML = `
-    <div class="lab-modal-card">
-      <div class="lab-modal-head">
-        <div>
-          <div class="kicker">DWG NO. 05-ASBUILT-2026 · ISA-5.1 PROCESS &amp; INSTRUMENTATION DIAGRAM</div>
-          <h2>Cross-flow scrubber <i>horizontal · bolted FRP vessel · tapered outlet · centrifugal ID fan</i></h2>
-        </div>
-        <div class="lab-modal-actions">
-          <button id="pidTripBtn" class="brk">Trip the pump <kbd style="font-size:0.85em;opacity:0.7">B</kbd></button>
-          <button id="pidCsvBtn">&#8595; Export CSV</button>
-          <button id="pidCloseBtn" class="primary">Close <kbd style="font-size:0.85em;opacity:0.75">Esc</kbd></button>
-        </div>
-      </div>
-      <div class="lab-modal-body">
-        <svg viewBox="0 0 1080 495" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <marker id="p-arr-gas" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#d95326"/>
-            </marker>
-            <marker id="p-arr-clean" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
-            </marker>
-            <marker id="p-arr-liq" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#0d9488"/>
-            </marker>
-            <marker id="p-arr-chem" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#4d7c0f"/>
-            </marker>
-            <pattern id="p-pall-hatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-              <line x1="0" y1="0" x2="0" y2="10" stroke="#9c9a94" stroke-width="1.6" />
-              <line x1="0" y1="0" x2="10" y2="0" stroke="#cfcdc6" stroke-width="1" />
-            </pattern>
-          </defs>
-
-          <!-- ROOF SPRAY HEADER & RISERS -->
-          <path id="pid-line-header" class="pid-flow-line" d="M 520 422 L 520 56 L 245 56 L 675 56" fill="none" stroke="#0d9488" stroke-width="3" marker-end="url(#p-arr-liq)"/>
-          <g stroke="#0d9488" stroke-width="2">
-            <line x1="250" y1="56" x2="250" y2="124" marker-end="url(#p-arr-liq)"/>
-            <line x1="335" y1="56" x2="335" y2="124" marker-end="url(#p-arr-liq)"/>
-            <line x1="435" y1="56" x2="435" y2="124" marker-end="url(#p-arr-liq)"/>
-            <line x1="535" y1="56" x2="535" y2="124" marker-end="url(#p-arr-liq)"/>
-            <line x1="635" y1="56" x2="635" y2="124" marker-end="url(#p-arr-liq)"/>
-          </g>
-          <text x="465" y="44" fill="#141414" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="pid-txt-liq">ROOF SPRAY HEADER · 67.1 m³/h (aw = 73 m²/m³)</text>
-
-          <!-- RECTANGULAR INLET DUCTWORK + SWEPT ELBOW + NH3 / H2S ANALYSERS -->
-          <path d="M 55 42 L 55 172 L 210 172 L 210 212 L 30 212 L 30 42 Z" fill="rgba(20, 20, 20, 0.05)" stroke="#141414" stroke-width="2"/>
-          <path d="M 42 52 L 42 192 L 202 192" fill="none" stroke="#d95326" stroke-width="3.5" marker-end="url(#p-arr-gas)"/>
-          <text x="72" y="62" fill="#141414" font-family="JetBrains Mono" font-size="10.5" font-weight="600">RECT. INLET DUCT (150 °C)</text>
-          <text x="72" y="77" fill="#585650" font-family="JetBrains Mono" font-size="10" id="pid-txt-inlet">20,000 Nm³/h · 2,000 ppmv SO₂</text>
-
-          <!-- NH3 & H2S Analyser Panels on Inlet Duct -->
-          <rect x="75" y="130" width="54" height="34" rx="3" fill="#ffffff" stroke="#141414" stroke-width="1.6"/>
-          <text x="102" y="145" fill="#141414" font-family="JetBrains Mono" font-size="9" font-weight="600" text-anchor="middle">AIT-NH₃</text>
-          <text x="102" y="157" fill="#0d9488" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">ONLINE</text>
-
-          <rect x="138" y="130" width="54" height="34" rx="3" fill="#ffffff" stroke="#141414" stroke-width="1.6"/>
-          <text x="165" y="145" fill="#141414" font-family="JetBrains Mono" font-size="9" font-weight="600" text-anchor="middle">AIT-H₂S</text>
-          <text x="165" y="157" fill="#0d9488" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">ONLINE</text>
-
-          <!-- MAIN BOLTED FRP VESSEL (V-05) WITH CHAMFERED ROOF & CONTINUOUS SUMP SKIRT -->
-          <polygon points="210,126 240,104 710,104 740,126 740,312 210,312" fill="rgba(255, 255, 255, 0.72)" stroke="#141414" stroke-width="2.5"/>
-          <text x="245" y="120" fill="#141414" font-family="JetBrains Mono" font-size="10" font-weight="600">V-05 · BOLTED FRP VESSEL (7.2m × 2.4m × 2.6m) + CONTINUOUS SUMP SKIRT</text>
-
-          <!-- INTEGRAL SUMP AT BOTTOM -->
-          <rect id="pid-sump-fill" x="212" y="270" width="526" height="40" fill="rgba(13, 148, 136, 0.22)"/>
-          <line x1="212" y1="270" x2="738" y2="270" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <text x="475" y="294" fill="#141414" font-family="JetBrains Mono" font-size="10.5" font-weight="500" text-anchor="middle" id="pid-txt-sump">SUMP TROUGH · Tw = 43 °C · Liquor Sheet Normal</text>
-
-          <!-- QUENCH CURTAIN & 4 PACKING STAGES -->
-          <polygon id="pid-curtain-0" points="250,126 234,268 266,268" fill="rgba(13, 148, 136, 0.28)"/>
-          <text x="250" y="260" fill="#0f766e" font-family="JetBrains Mono" font-size="8.5" font-weight="600" text-anchor="middle">QUENCH</text>
-
-          <g id="pid-beds">
-            <rect x="307" y="133" width="56" height="135" fill="url(#p-pall-hatch)" stroke="#141414" stroke-width="1.4"/>
-            <rect id="pid-curtain-1" x="307" y="133" width="56" height="135" fill="rgba(13, 148, 136, 0.22)"/>
-            <text x="335" y="203" fill="#141414" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle">STAGE 1</text>
-
-            <rect x="407" y="133" width="56" height="135" fill="url(#p-pall-hatch)" stroke="#141414" stroke-width="1.4"/>
-            <rect id="pid-curtain-2" x="407" y="133" width="56" height="135" fill="rgba(13, 148, 136, 0.22)"/>
-            <text x="435" y="203" fill="#141414" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle">STAGE 2</text>
-
-            <rect x="507" y="133" width="56" height="135" fill="url(#p-pall-hatch)" stroke="#141414" stroke-width="1.4"/>
-            <rect id="pid-curtain-3" x="507" y="133" width="56" height="135" fill="rgba(13, 148, 136, 0.22)"/>
-            <text x="535" y="203" fill="#141414" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle">STAGE 3</text>
-
-            <rect x="607" y="133" width="56" height="135" fill="url(#p-pall-hatch)" stroke="#141414" stroke-width="1.4"/>
-            <rect id="pid-curtain-4" x="607" y="133" width="56" height="135" fill="rgba(13, 148, 136, 0.22)"/>
-            <text x="635" y="203" fill="#141414" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle">STAGE 4</text>
-          </g>
-
-          <!-- Chevron Demister -->
-          <rect x="692" y="133" width="26" height="135" fill="rgba(37, 99, 235, 0.08)" stroke="#141414" stroke-width="1.4"/>
-          <polyline points="697,143 712,156 697,169 712,182 697,195 712,208 697,221 712,234 697,247" fill="none" stroke="#141414" stroke-width="1.6"/>
-          <text x="705" y="129" fill="#141414" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">DEMIST</text>
-
-          <!-- TAPERED OUTLET TRANSITION (BOX -> ROUND THROAT) -->
-          <polygon points="740,126 835,170 835,226 740,270" fill="rgba(20, 20, 20, 0.05)" stroke="#141414" stroke-width="2"/>
-          <text x="787" y="201" fill="#585650" font-family="JetBrains Mono" font-size="9.5" text-anchor="middle">TAPER</text>
-
-          <!-- CENTRIFUGAL ID FAN + DIRECT-COUPLED BLUE TEFC MOTOR + UPSTAND -->
-          <circle cx="895" cy="198" r="46" fill="#ffffff" stroke="#141414" stroke-width="2.2"/>
-          <rect x="885" y="90" width="52" height="72" fill="#ffffff" stroke="#141414" stroke-width="2"/>
-          <line x1="911" y1="148" x2="911" y2="46" stroke="#2563eb" stroke-width="4" marker-end="url(#p-arr-clean)"/>
-          <text x="980" y="62" fill="#141414" font-family="JetBrains Mono" font-size="10.5" font-weight="600" text-anchor="middle">FAN UPSTAND</text>
-          <text x="980" y="78" fill="#2563eb" font-family="JetBrains Mono" font-size="10" font-weight="600" text-anchor="middle" id="pid-txt-outlet">SO₂: 50 ppmv (97.5%)</text>
-
-          <!-- Direct-Coupled Blue TEFC Motor on Shared Base Frame -->
-          <rect x="955" y="174" width="88" height="48" rx="5" fill="#1d4ed8" stroke="#141414" stroke-width="1.8"/>
-          <line x1="941" y1="198" x2="955" y2="198" stroke="#141414" stroke-width="4"/>
-          <text x="999" y="195" fill="#ffffff" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle">BLUE TEFC</text>
-          <text x="999" y="209" fill="#dbeafe" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">ID FAN MOTOR</text>
-          <rect x="842" y="253" width="210" height="14" fill="#d6d4ce" stroke="#141414" stroke-width="1.4"/>
-          <text x="947" y="282" fill="#585650" font-family="JetBrains Mono" font-size="9" text-anchor="middle">RAISED FAN PLINTH + ISOLATOR</text>
-
-          <!-- ISA INSTRUMENT TRANSMITTER BUBBLES -->
-          <circle cx="755" cy="76" r="22" fill="#ffffff" stroke="#141414" stroke-width="1.8"/>
-          <text x="755" y="73" fill="#585650" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">PDI-05</text>
-          <text x="755" y="86" fill="#141414" font-family="JetBrains Mono" font-size="9.5" font-weight="600" text-anchor="middle" id="pid-tag-dp">807 Pa</text>
-
-          <!-- AT-101 Alkaline Sump pH (X = -1.8) -->
-          <line x1="330" y1="312" x2="330" y2="343" stroke="#141414" stroke-width="1.3" stroke-dasharray="3 3"/>
-          <circle id="pid-bub-ph1" cx="330" cy="366" r="23" fill="#ffffff" stroke="#141414" stroke-width="1.8"/>
-          <text x="330" y="361" fill="#585650" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">AT-101 pH</text>
-          <text x="330" y="375" fill="#141414" font-family="JetBrains Mono" font-size="10.5" font-weight="600" text-anchor="middle" id="pid-tag-ph1">8.5</text>
-
-          <!-- AT-102 Liquor ORP (X = +0.4) -->
-          <line x1="490" y1="312" x2="490" y2="343" stroke="#141414" stroke-width="1.3" stroke-dasharray="3 3"/>
-          <circle id="pid-bub-orp" cx="490" cy="366" r="23" fill="#ffffff" stroke="#141414" stroke-width="1.8"/>
-          <text x="490" y="361" fill="#585650" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">AT-102 ORP</text>
-          <text x="490" y="375" fill="#141414" font-family="JetBrains Mono" font-size="10" font-weight="600" text-anchor="middle" id="pid-tag-orp">+320mV</text>
-
-          <!-- AT-103 Acid Outlet pH (X = +2.4) -->
-          <line x1="650" y1="312" x2="650" y2="343" stroke="#141414" stroke-width="1.3" stroke-dasharray="3 3"/>
-          <circle id="pid-bub-ph2" cx="650" cy="366" r="23" fill="#ffffff" stroke="#141414" stroke-width="1.8"/>
-          <text x="650" y="361" fill="#585650" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">AT-103 pH</text>
-          <text x="650" y="375" fill="#141414" font-family="JetBrains Mono" font-size="10.5" font-weight="600" text-anchor="middle" id="pid-tag-ph2">7.0</text>
-
-          <!-- INLET-END CHEMICAL DOSING SKID (2 VERTICAL PUMPS + BUNDED DAY TANK) -->
-          <rect x="35" y="338" width="165" height="132" rx="4" fill="rgba(255,255,255,0.65)" stroke="#141414" stroke-width="1.5"/>
-          <text x="117" y="354" fill="#141414" font-family="JetBrains Mono" font-size="9" font-weight="600" text-anchor="middle">INLET DOSING SKID</text>
-          <rect x="48" y="366" width="58" height="80" rx="3" fill="#e4e2dc" stroke="#141414" stroke-width="1.5"/>
-          <text x="77" y="401" fill="#141414" font-family="JetBrains Mono" font-size="8.5" font-weight="600" text-anchor="middle">DAY TANK</text>
-          <text x="77" y="416" fill="#4d7c0f" font-family="JetBrains Mono" font-size="9" font-weight="600" text-anchor="middle" id="pid-txt-naoh">160 kg/h</text>
-          <circle cx="135" cy="392" r="12" fill="#566642" stroke="#141414" stroke-width="1.4"/>
-          <circle cx="170" cy="392" r="12" fill="#566642" stroke="#141414" stroke-width="1.4"/>
-          <text x="152" y="421" fill="#585650" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">2× VERT. PUMPS</text>
-          <path class="pid-flow-line" d="M 152 378 L 152 298 L 212 298" fill="none" stroke="#4d7c0f" stroke-width="2.2" marker-end="url(#p-arr-chem)"/>
-
-          <!-- FRONT PUMP HALL (DUTY / STANDBY uPVC PUMPS + RED LEVER VALVE STACKS + RACK) -->
-          <path id="pid-line-suction" class="pid-flow-line" d="M 415 312 L 415 436 L 502 436" fill="none" stroke="#0d9488" stroke-width="3" marker-end="url(#p-arr-liq)"/>
-          <circle id="pid-pump-duty" cx="520" cy="436" r="18" fill="#52614c" stroke="#141414" stroke-width="2"/>
-          <polygon points="513,428 530,436 513,444" fill="#ffffff"/>
-          <text x="520" y="469" fill="#141414" font-family="JetBrains Mono" font-size="10" font-weight="600" text-anchor="middle" id="pid-txt-pump">P-101A DUTY · 52 m³/h (4.1 kW)</text>
-
-          <circle cx="645" cy="436" r="16" fill="#d6d4ce" stroke="#585650" stroke-width="1.5"/>
-          <polygon points="639,429 653,436 639,443" fill="#585650"/>
-          <text x="645" y="469" fill="#8c8b87" font-family="JetBrains Mono" font-size="9.5" text-anchor="middle">P-101B STANDBY (IN RACK)</text>
-        </svg>
-      </div>
-      <div class="lab-modal-foot">
-        <div class="lab-pid-legend">
-          <span><i class="lab-pid-swatch" style="background:#d95326"></i>Dirty gas (rect. duct)</span>
-          <span><i class="lab-pid-swatch" style="background:#2563eb"></i>Scrubbed gas (taper → ID fan)</span>
-          <span><i class="lab-pid-swatch" style="background:#0d9488"></i>Recirc liquor (uPVC risers)</span>
-          <span><i class="lab-pid-swatch" style="background:#4d7c0f"></i>Inlet dosing skid feed</span>
-        </div>
-        <div id="pid-status-banner" style="color:#141414;font-weight:600">STATUS: IN COMPLIANCE · ALL AS-BUILT INTERLOCKS HEALTHY</div>
-      </div>
-    </div>
-  `
-  lab.ui.appendChild(pidModal)
-
-  // Create the Editorial Historian Drawer
-  const histDrawer = document.createElement('div')
-  histDrawer.className = 'lab-hist-drawer on'
-  histDrawer.id = 'labHistDrawer'
-  histDrawer.innerHTML = `
-    <div class="lab-hist-head">
-      <div class="lab-hist-title">Telemetry historian <small>1 Hz auto-sampler · Onda + Eckert + psychrometric solver</small></div>
-      <div class="lab-modal-actions">
-        <button id="histSnapBtn" title="Record an immediate snapshot">Snapshot</button>
-        <button id="histClearBtn" title="Clear recorded rows">Clear</button>
-        <button id="histDownloadBtn" class="primary">&#8595; Download CSV (<span id="histCountLbl">0</span>)</button>
-        <button id="histCloseBtn">&#10005;</button>
-      </div>
-    </div>
-    <div class="lab-hist-table-wrap">
-      <table class="lab-hist-table">
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Load</th>
-            <th>Qn (Nm³/h)</th>
-            <th>Removal η</th>
-            <th>SO₂ out</th>
-            <th>ΔP (Pa)</th>
-            <th>Liquor</th>
-            <th>NaOH</th>
-            <th>pH sump</th>
-            <th>ORP</th>
-            <th>pH out</th>
-            <th>State</th>
-          </tr>
-        </thead>
-        <tbody id="labHistTbody"></tbody>
-      </table>
-    </div>
-  `
-  lab.ui.appendChild(histDrawer)
-
-  // Historian state & recorder
-  const logs = []
-  const maxRows = 600
-  let logTimer = 0
-  const tbody = histDrawer.querySelector('#labHistTbody')
-  const countBadge = toolsBar.querySelector('#labHistCount')
-  const countLbl = histDrawer.querySelector('#histCountLbl')
-  const recDot = toolsBar.querySelector('#labRecDot')
-
-  function recordRow(tag = '') {
-    const frac = load.value / 100
-    const t = solve(frac, S.liq)
-    const state = S.broken ? 'PUMP_TRIPPED' : (tag || (S.Cout > 150 ? 'BREAKTHROUGH' : 'IN_COMPLIANCE'))
-    const row = {
-      iso: new Date().toISOString(),
-      simTime: lab.time.toFixed(1),
-      loadPct: +load.value.toFixed(1),
-      Qn: Math.round(S.Qn),
-      etaPct: +(S.eta * 100).toFixed(2),
-      Cout: Math.round(S.Cout),
-      dP: Math.round(t.dP),
-      Tw: +t.Tw.toFixed(1),
-      liquorM3h: +(t.QL * 3600).toFixed(2),
-      naohKgh: Math.round(t.NaOH),
-      pumpM3h: +(S.Qp * 3600 * S.liq).toFixed(1),
-      pumpKw: +(S.Pp * S.liq).toFixed(1),
-      pH: +S.pH.toFixed(2),
-      orp: Math.round(S.ORP),
-      pHout: +S.pHout.toFixed(2),
-      aw: +t.aw.toFixed(1),
-      ntu: +t.NTU.toFixed(2),
-      state
-    }
-    logs.push(row)
-    if (logs.length > maxRows) logs.shift()
-    countBadge.textContent = String(logs.length)
-    countLbl.textContent = String(logs.length)
-
-    const tr = document.createElement('tr')
-    if (S.broken || S.Cout > 150) tr.className = 'bad-row'
-    tr.innerHTML = `
-      <td>${row.simTime}s</td>
-      <td>${row.loadPct}%</td>
-      <td>${fmt(row.Qn)}</td>
-      <td>${row.etaPct.toFixed(1)}%</td>
-      <td>${row.Cout} ppm</td>
-      <td>${row.dP}</td>
-      <td>${row.liquorM3h.toFixed(1)} m³/h</td>
-      <td>${row.naohKgh} kg/h</td>
-      <td>${row.pH.toFixed(1)}</td>
-      <td>+${row.orp} mV</td>
-      <td>${row.pHout.toFixed(1)}</td>
-      <td>${row.state}</td>
-    `
-    tbody.prepend(tr)
-    while (tbody.children.length > 45) tbody.removeChild(tbody.lastChild)
-  }
-
-  function exportCSV() {
-    if (!logs.length) recordRow('INITIAL')
-    const cols = [
-      'ISO_Timestamp','Sim_Time_s','Gas_Load_Pct','Gas_Flow_Nm3h','SO2_Removal_Pct',
-      'SO2_Out_ppmv','DeltaP_Pa','Sump_Temp_C','Liquor_Rate_m3h','NaOH_Feed_kgh',
-      'Duty_Pump_Flow_m3h','Duty_Pump_kW','pH_Alkaline_Sump','ORP_Liquor_mV',
-      'pH_Acid_Outlet','Wetted_Area_aw_m2m3','Total_NTU','Operating_State'
-    ]
-    const lines = [cols.join(',')]
-    for (const r of logs) {
-      lines.push([
-        r.iso, r.simTime, r.loadPct, r.Qn, r.etaPct,
-        r.Cout, r.dP, r.Tw, r.liquorM3h, r.naohKgh,
-        r.pumpM3h, r.pumpKw, r.pH, r.orp,
-        r.pHout, r.aw, r.ntu, r.state
-      ].join(','))
-    }
-    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    a.href = url
-    a.download = `crossflow-scrubber-asbuilt-${stamp}.csv`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
-
-  // Initial seed row
-  recordRow('DESIGN_POINT')
-
-  // P&ID DOM refs
-  const pidTxtLiq = pidModal.querySelector('#pid-txt-liq')
-  const pidTxtInlet = pidModal.querySelector('#pid-txt-inlet')
-  const pidTxtOutlet = pidModal.querySelector('#pid-txt-outlet')
-  const pidTxtSump = pidModal.querySelector('#pid-txt-sump')
-  const pidTagDp = pidModal.querySelector('#pid-tag-dp')
-  const pidTagPh1 = pidModal.querySelector('#pid-tag-ph1')
-  const pidTagOrp = pidModal.querySelector('#pid-tag-orp')
-  const pidTagPh2 = pidModal.querySelector('#pid-tag-ph2')
-  const pidTxtPump = pidModal.querySelector('#pid-txt-pump')
-  const pidTxtNaoh = pidModal.querySelector('#pid-txt-naoh')
-  const pidLineHeader = pidModal.querySelector('#pid-line-header')
-  const pidLineSuction = pidModal.querySelector('#pid-line-suction')
-  const pidPumpDuty = pidModal.querySelector('#pid-pump-duty')
-  const pidBubPh1 = pidModal.querySelector('#pid-bub-ph1')
-  const pidBubOrp = pidModal.querySelector('#pid-bub-orp')
-  const pidBubPh2 = pidModal.querySelector('#pid-bub-ph2')
-  const pidStatusBanner = pidModal.querySelector('#pid-status-banner')
-  const pidTripBtn = pidModal.querySelector('#pidTripBtn')
-  const pidCurtains = [
-    pidModal.querySelector('#pid-curtain-0'),
-    pidModal.querySelector('#pid-curtain-1'),
-    pidModal.querySelector('#pid-curtain-2'),
-    pidModal.querySelector('#pid-curtain-3'),
-    pidModal.querySelector('#pid-curtain-4'),
-  ]
-
-  lab.onTick((sdt) => {
-    const frac = load.value / 100
-    const t = solve(frac, S.liq)
-    const etaPct = fmt(S.eta * 100, 1)
-
-    recDot.classList.toggle('paused', !!lab.paused)
-    recDot.classList.toggle('bad', !!S.broken)
-
-    if (pidModal.classList.contains('open')) {
-      pidTxtLiq.textContent = `ROOF SPRAY HEADER · ${fmt(t.QL * 3600, 1)} m³/h (aw = ${fmt(t.aw)} m²/m³)`
-      pidTxtInlet.textContent = `${fmt(S.Qn)} Nm³/h (${fmt(load.value, 0)}%) · 2,000 ppmv SO₂`
-      pidTxtOutlet.textContent = `SO₂: ${fmt(S.Cout)} ppmv (${etaPct}%)`
-      pidTxtSump.textContent = S.broken
-        ? `SUMP TROUGH · Tw = ${fmt(t.Tw)} °C · PUMP TRIPPED — PADS DRYING`
-        : `SUMP TROUGH · Tw = ${fmt(t.Tw)} °C · Liquor Sheet Normal`
-      pidTagDp.textContent = `${fmt(t.dP)} Pa`
-      pidTagPh1.textContent = fmt(S.pH, 1)
-      pidTagOrp.textContent = `+${fmt(S.ORP)}mV`
-      pidTagPh2.textContent = fmt(S.pHout, 1)
-      pidTxtPump.textContent = S.broken
-        ? `P-101A TRIPPED · LIQUOR DECAYING`
-        : `P-101A DUTY · ${fmt(S.Qp * 3600)} m³/h (${fmt(S.Pp, 1)} kW)`
-      pidTxtNaoh.textContent = `${fmt(t.NaOH)} kg/h`
-
-      pidLineHeader.classList.toggle('stopped', S.broken)
-      pidLineSuction.classList.toggle('stopped', S.broken)
-      pidPumpDuty.setAttribute('fill', S.broken ? '#e4572e' : '#52614c')
-      pidBubPh1.setAttribute('stroke', S.broken ? '#e4572e' : '#141414')
-      pidBubOrp.setAttribute('stroke', S.broken ? '#e4572e' : '#141414')
-      pidBubPh2.setAttribute('stroke', S.broken ? '#e4572e' : '#141414')
-      pidTripBtn.classList.toggle('act', S.broken)
-      pidTripBtn.innerHTML = S.broken ? 'Restore pump <kbd style="font-size:0.85em;opacity:0.75">B</kbd>' : 'Trip the pump <kbd style="font-size:0.85em;opacity:0.7">B</kbd>'
-
-      for (const c of pidCurtains) c.setAttribute('fill', `rgba(13, 148, 136, ${(0.03 + 0.25 * S.liq).toFixed(2)})`)
-
-      if (S.broken) {
-        pidStatusBanner.style.color = '#e4572e'
-        pidStatusBanner.textContent = 'ALARM: P-101A DUTY PUMP TRIPPED · SO₂ BREAKTHROUGH · pH & ORP SAGGING'
-      } else {
-        pidStatusBanner.style.color = '#141414'
-        pidStatusBanner.textContent = 'STATUS: IN COMPLIANCE · ALL AS-BUILT INTERLOCKS HEALTHY'
-      }
-    }
-
-    if (sdt > 0) {
-      logTimer += sdt
-      if (logTimer >= 1.0) {
-        logTimer %= 1.0
-        recordRow()
-      }
-    }
-  })
-
-  const setPidOpen = (open) => {
-    pidModal.classList.toggle('open', open)
-    pidBtn.classList.toggle('primary', open)
-  }
-  const setHistOpen = (open) => {
-    histDrawer.classList.toggle('open', open)
-    histBtn.classList.toggle('primary', open)
-  }
-
-  pidBtn.addEventListener('click', () => setPidOpen(!pidModal.classList.contains('open')))
-  pidModal.querySelector('#pidCloseBtn').addEventListener('click', () => setPidOpen(false))
-  pidModal.addEventListener('click', (e) => { if (e.target === pidModal) setPidOpen(false) })
-  pidTripBtn.addEventListener('click', () => { lab.toggle('break'); recordRow(lab.broken ? 'TRIP_EVENT' : 'RESET_EVENT') })
-  pidModal.querySelector('#pidCsvBtn').addEventListener('click', exportCSV)
-
-  histBtn.addEventListener('click', () => setHistOpen(!histDrawer.classList.contains('open')))
-  histDrawer.querySelector('#histCloseBtn').addEventListener('click', () => setHistOpen(false))
-  histDrawer.querySelector('#histSnapBtn').addEventListener('click', () => recordRow('MANUAL_SNAP'))
-  histDrawer.querySelector('#histClearBtn').addEventListener('click', () => {
-    logs.length = 0
-    tbody.innerHTML = ''
-    countBadge.textContent = '0'
-    countLbl.textContent = '0'
-  })
-  histDrawer.querySelector('#histDownloadBtn').addEventListener('click', exportCSV)
-  csvBtn.addEventListener('click', exportCSV)
-
+  const toggleMode = (m) => setMode(V.mode === m ? '3d' : m)
+  b2.addEventListener('click', () => toggleMode('2d'))
+  bP.addEventListener('click', () => toggleMode('pid'))
   addEventListener('keydown', (e) => {
     if (e.target?.tagName === 'INPUT') return
-    if (e.key === 'Escape') {
-      if (pidModal.classList.contains('open')) setPidOpen(false)
-      else if (histDrawer.classList.contains('open')) setHistOpen(false)
-      return
-    }
-    const k = e.key.toLowerCase()
-    if (k === 'p') { e.preventDefault(); setPidOpen(!pidModal.classList.contains('open')) }
-    else if (k === 'h') { e.preventDefault(); setHistOpen(!histDrawer.classList.contains('open')) }
+    if (e.key === '2') { e.preventDefault(); toggleMode('2d') }
+    if (e.key.toLowerCase() === 'p') { e.preventDefault(); toggleMode('pid') }
   })
+  onLang(() => setMode(V.mode))
+
+  window.__view = {
+    set: setMode, toggle: toggleMode,
+    get mode() { return V.mode },
+    register(k, el, paint) { V.panels[k] = el; V.paints[k] = paint; return setMode(V.mode) },
+  }
+  // Compatibility handle used by the guided tour and the layout tests.
+  window.__flat = { set: (on) => setMode(on ? '2d' : '3d'), toggle: () => toggleMode('2d'), get on() { return V.mode === '2d' } }
+
+  // One bypass for both drawings: keep the solver ticking, skip all of WebGL.
+  const render3D = lab.render.bind(lab)
+  lab.render = (dt) => { if (V.mode !== '3d') { lab._update(dt); return } render3D(dt) }
+  lab.onTick(() => { if (V.mode !== '3d') V.paints[V.mode]?.() })
+}
+
+// ------------------------------------------------------------------ 2D side elevation
+// A flat technical drawing replaces the WebGL canvas. Plain SVG + CSS, driven by
+// the same live solver readouts; the whole render pipeline is skipped while it is
+// showing, which also makes this the lightest way to view the machine.
+{
+  const css = document.createElement('style')
+  css.textContent = `
+.lab-2d { position:absolute; inset:0; background:var(--paper); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; pointer-events:none; z-index:0 }
+.lab-2d.on { opacity:1; visibility:visible }
+.lab-2d > svg { position:absolute; left:3vw; top:50%; transform:translateY(-50%); width:min(67vw,1060px,126vh,calc(100vw - 7.2vw - var(--railw,22.5vw) - 1.4em)); height:auto; overflow:visible }
+html.flatview #lab-gl, html.flatview .lab-labels, html.flatview .lab-scale, html.flatview .lab-beat, html.flatview .lab-flash, html.flatview .lab-cursor { visibility:hidden }
+html.flatview .lab-rail { z-index:2 }
+html.flatview .lab-modes button:not([data-k=run]):not([data-k=break]) { opacity:.38 }
+html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
+.lab-2d .vs { fill:var(--paper); stroke:var(--ink); stroke-width:1.7; stroke-linejoin:round }
+.lab-2d .ln { fill:none; stroke:var(--ink); stroke-width:1.6 }
+.lab-2d .th { fill:none; stroke:var(--mute); stroke-width:1 }
+.lab-2d .hatch { fill:url(#f2dhatch); stroke:var(--ink); stroke-width:1.4 }
+.lab-2d text { font-family:var(--mono); font-size:14px; fill:var(--mute); letter-spacing:.02em }
+.lab-2d text.t { font-size:12px }
+.lab-2d text.h1 { font-family:var(--sans); font-size:21px; font-weight:600; fill:var(--ink); letter-spacing:.01em }
+.lab-2d text.h2 { font-size:16px; fill:var(--ink) }
+.lab-2d .blue { fill:#2f6fb0; opacity:.88 }
+.lab-2d .water { fill:rgba(47,111,176,.18); stroke:#2f6fb0; stroke-width:1 }
+.lab-2d .bolt { fill:var(--paper); stroke:var(--mute); stroke-width:.8 }
+@keyframes f2dgas { to { stroke-dashoffset:-30 } }
+@keyframes f2dliq { to { stroke-dashoffset:-22 } }
+.lab-2d .gas { fill:none; stroke:#e4572e; stroke-width:2; stroke-dasharray:9 6; opacity:.9; animation:f2dgas 1.5s linear infinite }
+.lab-2d .liq { fill:none; stroke:#2f6fb0; stroke-width:1.5; stroke-dasharray:3 8; opacity:.85; animation:f2dliq 1.1s linear infinite }
+.lab-2d.dry .liq { animation-play-state:paused; opacity:.12 }
+.lab-2d.dry .water { opacity:.3 }
+.lab-2d.frozen .gas, .lab-2d.frozen .liq { animation-play-state:paused }
+.lab-2d .panhint { display:none }
+`
+  document.head.appendChild(css)
+
+  const stageX = [286, 378, 470, 562]
+  const stages = stageX.map((x, i) => `
+    <rect class="hatch" x="${x}" y="208" width="80" height="166"/>
+    <text class="t" x="${x + 40}" y="392" text-anchor="middle">P${i + 1}</text>
+    ${[14, 30, 46, 62].map(dx => `<path class="liq" d="M ${x + dx} 196 V 372"/>`).join('')}
+    <path class="th" d="M ${x + 8} 208 V 374 M ${x + 72} 208 V 374"/>`).join('')
+  const groundHatch = Array.from({ length: 48 }, (_, i) => `<path class="th" d="M ${24 + i * 20} 428 l -7 9" opacity=".45"/>`).join('')
+  const bolts = Array.from({ length: 16 }, (_, i) => `<circle class="bolt" cx="${180 + i * 37}" cy="164" r="2.1"/><circle class="bolt" cx="${180 + i * 37}" cy="384" r="2.1"/>`).join('')
+  const panels = Array.from({ length: 7 }, (_, i) => `<path class="th" d="M ${168 + (i + 1) * 74} 158 V 390" opacity=".55"/>`).join('')
+  const quench = Array.from({ length: 6 }, (_, i) => `<path class="liq" d="M ${186 + i * 14} 172 V 250"/>`).join('')
+  const demister = Array.from({ length: 9 }, (_, i) => `<path class="th" d="M 668 ${220 + i * 18} l 10 -9 l 10 9 l 10 -9 l 10 9 l 10 -9 l 10 9 l 10 -9"/>`).join('')
+  const blades = Array.from({ length: 5 }, (_, i) => {
+    const a = i * 72 * Math.PI / 180
+    const p = (r, o) => `${(906 + Math.cos(a + o) * r).toFixed(1)} ${(275 + Math.sin(a + o) * r).toFixed(1)}`
+    return `<path class="ln" d="M ${p(8, 0)} Q ${p(23, .26)} ${p(31, .52)}"/>`
+  }).join('')
+
+  const flat = document.createElement('div')
+  flat.className = 'lab-2d'
+  flat.setAttribute('aria-hidden', 'true')
+  flat.innerHTML = `
+<svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2D side elevation of the cross-flow wet scrubber">
+  <defs>
+    <pattern id="f2dhatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#8c8b87" stroke-width="1" opacity=".55"/>
+    </pattern>
+    <marker id="f2darw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#e4572e"/></marker>
+  </defs>
+  <text class="h1" x="24" y="40" data-l="0">CROSS-FLOW WET SCRUBBER</text>
+  <text x="24" y="66" data-l="1">SIDE ELEVATION · AS BUILT · 1:50</text>
+  <text class="h2" id="f2dLoad" x="976" y="40" text-anchor="end">GAS LOAD 100 %</text>
+  <text class="h2" id="f2dRem" x="976" y="68" text-anchor="end">SO₂ REMOVAL — %</text>
+  <text id="f2dState" x="976" y="90" text-anchor="end">—</text>
+
+  <path class="ln" d="M 24 428 H 976"/>${groundHatch}
+
+  <path class="vs" d="M 24 254 H 150 L 168 210 V 372 L 150 334 H 24 Z"/>
+  <path class="gas" d="M 34 294 H 142" marker-end="url(#f2darw)"/>
+  <text class="inlet" x="24" y="198" data-l="2">DIRTY GAS 150 °C</text>
+  <path class="th" d="M 88 204 V 254"/>
+
+  <path class="vs" d="M 30 412 H 146 V 418 H 30 Z"/>
+  <rect class="vs" x="42" y="350" width="34" height="60" rx="3"/>
+  <rect class="water" x="45" y="374" width="28" height="33"/>
+  <rect class="vs" x="90" y="380" width="16" height="30" rx="2"/>
+  <rect class="vs" x="114" y="380" width="16" height="30" rx="2"/>
+  <path class="th" d="M 76 380 H 90 M 76 392 H 114"/>
+  <text x="24" y="448" data-l="3">DOSING SKID · NaOH / H₂SO₄</text>
+
+  <rect class="vs" x="168" y="158" width="592" height="232"/>
+  ${panels}${bolts}
+  <rect class="vs" x="176" y="390" width="576" height="34"/>
+  <rect class="water" x="180" y="402" width="568" height="20"/>
+  <text class="t" x="184" y="416" data-l="4">ALKALINE SUMP · pH 8.5</text>
+
+  <path class="ln" d="M 176 172 H 268"/>${quench}
+  <text x="176" y="130" data-l="5">QUENCH · 43 °C SATURATION</text>
+  <path class="th" d="M 220 134 V 158"/>
+
+  <path class="ln" d="M 278 188 H 650"/>
+  <path class="th" d="M 278 188 V 176 M 650 188 V 176"/>
+  ${stageX.map(x => `<path class="th" d="M ${x + 40} 188 V 196"/>`).join('')}
+  <text x="430" y="150" data-l="6">ROOF SPRAY HEADERS</text>
+  <path class="th" d="M 464 154 V 176"/>
+
+  ${stages}
+  <path class="gas" d="M 172 294 H 656" opacity=".55"/>
+
+  <rect class="vs" x="664" y="208" width="76" height="166"/>
+  ${demister}
+
+  <path class="vs" d="M 760 158 L 830 224 V 326 L 760 390 Z"/>
+  <rect class="vs" x="830" y="224" width="42" height="102"/>
+
+  <circle class="vs" cx="906" cy="275" r="44"/>${blades}
+  <circle class="ln" cx="906" cy="275" r="7"/>
+  <path class="ln" d="M 872 250 V 224 H 906"/>
+  <path class="gas" d="M 906 224 V 186" marker-end="url(#f2darw)"/>
+  <rect class="blue" x="950" y="256" width="26" height="38" rx="4"/>
+  <path class="ln" d="M 950 275 H 940"/>
+  <text x="820" y="200" data-l="9">ID FAN</text>
+  <text class="t" x="900" y="342" text-anchor="middle" data-l="10">BLUE MOTOR</text>
+
+  <path class="th" d="M 168 470 V 486 M 760 470 V 486 M 168 480 H 760"/>
+  <text x="464" y="474" text-anchor="middle" data-l="12">7.2 m</text>
+  <text x="286" y="452" data-l="11">4 × 0.6 m PACKING STAGES</text>
+  <text x="664" y="452" data-l="7">DEMISTER</text>
+  <text x="770" y="452" data-l="8">TAPERED OUTLET</text>
+  <text class="t" x="24" y="506" data-l="13">SECTION A–A · GAS CROSSES THE LIQUOR-WETTED PADS SIDEWAYS</text>
+  <text class="panhint" x="24" y="104" data-i18n="swipeHint">SWIPE TO PAN →</text>
+</svg>`
+  lab.ui.prepend(flat)
+
+  const $2 = (id) => flat.querySelector('#' + id)
+
+  function paintElevation() {
+    const L = tr('elevLabels')
+    for (const t of flat.querySelectorAll('text[data-l]')) t.textContent = L[Number(t.dataset.l)] ?? t.textContent
+  }
+  onLang(paintElevation)
+
+  function updateHUD() {
+    const v = lab.ui.querySelector('.lab-big .v')?.textContent ?? '—'
+    const st = lab.ui.querySelector('.lab-metric .lbl .st')?.textContent ?? ''
+    const sub = lab.ui.querySelector('.lab-sub')?.textContent ?? ''
+    const ppm = (sub.match(/([\d.]+)\s*ppmv/) || [])[1] ?? '—'
+    $2('f2dLoad').textContent = tr('hudLoad') + ' ' + Math.round(load.value) + ' %'
+    $2('f2dRem').textContent = tr('hudRem') + ' ' + v + ' %'
+    $2('f2dState').textContent = tr('hudOutlet') + ' ' + ppm + ' ppmv · ' + (lab.broken ? tr('hudPumpTripped') : st)
+    flat.classList.toggle('dry', !!lab.broken)
+    flat.classList.toggle('frozen', !!lab.paused)
+  }
+  onLang(updateHUD)
+
+  window.__view.register('2d', flat, updateHUD)
+  paintElevation()
+  updateHUD()
+}
+
+// ------------------------------------------------------------------ P&I diagram
+// Process lines (solid), signal lines (dashed violet), instrument bubbles,
+// control valves, pumps, tanks and a DCS box. Same live solver numbers as the
+// elevation view, so switching language or tripping the pump repaints it too.
+{
+  const pads = [302, 400, 498, 596].map((x, i) => `
+    <rect class="blue" x="${x}" y="208" width="80" height="144"/>
+    <path class="thin" d="M ${x} 208 V 352 M ${x + 80} 208 V 352"/>
+    <rect class="chip" x="${x + 20}" y="212" width="40" height="26" rx="3"/>
+    <text class="tag" x="${x + 40}" y="230" text-anchor="middle">P${i + 1}</text>`).join('')
+  const drops = [302, 400, 498, 596].flatMap(x => [16, 36, 56, 74].map(dx =>
+    `<path class="liq" d="M ${x + dx} 206 V 348"/>`)).join('')
+  const chevrons = Array.from({ length: 8 }, (_, i) =>
+    `<path class="thin" d="M 696 ${216 + i * 17} l 6 -7 l 6 7 l 6 -7 l 6 7 l 6 -7 l 6 7"/>`).join('')
+  const bubble = (x, cy, tag) => `<circle class="bub" cx="${x}" cy="${cy}" r="26"/><text class="tag" x="${x}" y="${cy + 4}" text-anchor="middle">${tag}</text>`
+  const valve = (x, y, tag) => `<path class="valve" d="M ${x - 15} ${y - 12} L ${x + 15} ${y + 12} L ${x + 15} ${y - 12} L ${x - 15} ${y + 12} Z"/><text class="tag" x="${x}" y="${y + 34}" text-anchor="middle">${tag}</text>`
+  const pump = (x, y, r, tag) => `<circle class="unit" cx="${x}" cy="${y}" r="${r}"/><path class="thin" d="M ${x - r * 0.45} ${y - r * 0.5} L ${x + r * 0.6} ${y} L ${x - r * 0.45} ${y + r * 0.5} Z"/><text class="tag" x="${x}" y="${y + r + 18}" text-anchor="middle">${tag}</text>`
+  const tank = (x, y, w, h, tag) => `<rect class="unit" x="${x}" y="${y}" width="${w}" height="${h}" rx="5"/><rect class="blue" x="${x + 3}" y="${y + h * 0.42}" width="${w - 6}" height="${h * 0.55}"/><text class="tag" x="${x + w / 2}" y="${y + h + 18}" text-anchor="middle">${tag}</text>`
+
+  const pid = document.createElement('div')
+  pid.className = 'lab-pid'
+  pid.setAttribute('aria-hidden', 'true')
+  pid.innerHTML = `
+<svg viewBox="0 0 1120 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Piping and instrumentation diagram of the cross-flow wet scrubber">
+  <defs>
+    <marker id="pidarw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#e4572e"/></marker>
+  </defs>
+
+  <!-- header: title, subtitle and the three live HUD lines -->
+  <text class="h1" x="28" y="38" data-l="0">P&amp;I DIAGRAM · CROSS-FLOW SCRUBBER</text>
+  <text x="28" y="64" data-l="1">PROCESS &amp; INSTRUMENTATION · AS BUILT</text>
+  <text class="panhint" x="28" y="86" data-i18n="swipeHint">SWIPE TO PAN →</text>
+  <text class="h2" id="pidLoad" x="1092" y="22" text-anchor="end">—</text>
+  <text class="h2" id="pidRem" x="1092" y="52" text-anchor="end">—</text>
+  <text id="pidState" x="1092" y="82" text-anchor="end">—</text>
+  <path class="thin" d="M 28 92 H 1092" opacity=".5"/>
+
+  <!-- signal bus and the DCS / PLC cabinet -->
+  <path class="sig" d="M 112 114 H 884"/>
+  <path class="sig" d="M 112 114 V 212 M 240 114 V 132 M 340 114 V 132 M 600 114 V 132 M 680 114 V 132 M 748 114 V 132"/>
+  <rect class="unit" x="884" y="96" width="208" height="64" rx="4"/>
+  <text class="h2" x="988" y="124" text-anchor="middle">DCS / PLC</text>
+  <text class="sch" x="988" y="146" text-anchor="middle" data-l="14">TO DCS / PLC</text>
+
+  <!-- dirty gas inlet -->
+  <path class="hot" d="M 28 288 H 184" marker-end="url(#pidarw)"/>
+  ${bubble(112, 238, 'FIT-101')}
+  <path class="thin" d="M 112 264 V 288"/>
+  <text class="sch inlet" x="28" y="322" data-l="2">INLET GAS · 150 °C</text>
+  <path class="thin" d="M 70 306 V 292"/>
+
+  <!-- vessel, quench, four packed stages, demister, sump -->
+  <rect class="unit" x="190" y="196" width="570" height="186" rx="4"/>
+  <rect class="thin" x="202" y="208" width="80" height="158"/>
+  ${drops}${pads}
+  <rect class="unit" x="692" y="208" width="56" height="144"/>
+  ${chevrons}
+  <rect class="blue" x="202" y="354" width="546" height="24"/>
+  <text class="tag" x="212" y="371" data-l="7">ALKALINE SUMP</text>
+  <path class="hot" d="M 196 300 H 752" opacity=".45"/>
+  <path class="liq" d="M 292 202 H 684"/>
+
+  <!-- field instruments above the vessel -->
+  ${bubble(240, 158, 'TIT-101')}${bubble(340, 158, 'PIT-101')}${bubble(600, 158, 'AIT-101')}${bubble(680, 158, 'AIT-102')}${bubble(748, 158, 'AIT-103')}
+  <path class="thin" d="M 240 184 V 196 M 340 184 V 196 M 600 184 V 196 M 680 184 V 196 M 748 184 V 196"/>
+
+  <!-- clean gas, ID fan, stack -->
+  <path class="proc" d="M 762 288 H 818"/>
+  <circle class="unit" cx="850" cy="288" r="32"/>
+  <path class="thin" d="M 850 256 V 320 M 818 288 H 882 M 826 264 L 874 312 M 826 312 L 874 264"/>
+  <text class="tag" x="850" y="338" text-anchor="middle">ID FAN</text>
+  <path class="proc" d="M 882 288 H 1010 V 184"/>
+  <path class="proc" d="M 998 184 V 288 M 1022 184 V 288"/>
+  <path class="hot" d="M 1010 284 V 178" marker-end="url(#pidarw)"/>
+  <text x="1036" y="236" data-l="20">STACK</text>
+
+  <!-- recirculation loop and the two dosing skids -->
+  <path class="liq" d="M 202 366 H 180 V 430 H 776 V 202 H 684"/>
+  ${pump(300, 430, 18, 'P-101')}
+  ${valve(450, 430, 'FV-101')}
+  ${tank(40, 482, 52, 60, 'T-102')}
+  ${pump(150, 512, 15, 'P-102')}
+  <path class="liq" d="M 92 512 H 135 M 165 512 H 180 V 430"/>
+  ${tank(300, 482, 52, 60, 'T-103')}
+  ${pump(410, 512, 15, 'P-103')}
+  <path class="liq" d="M 352 512 H 395 M 425 512 H 490 V 430"/>
+
+  <!-- legend + equipment schedule (right-hand columns) -->
+  <path class="thin" d="M 596 442 H 1092" opacity=".5"/>
+  <rect class="well" x="596" y="444" width="496" height="148"/>
+  <path class="proc" d="M 612 486 H 650"/>
+  <path class="sig" d="M 612 508 H 650"/>
+  <circle class="bub" cx="631" cy="530" r="9"/>
+  <path class="valve" d="M 612 546 L 632 556 L 632 546 L 612 556 Z"/>
+  <path class="proc" d="M 619 570 V 582 M 627 570 V 582"/>
+
+  <!-- opaque wells: drawn after all line work so no caption is struck through -->
+  <rect class="well" x="390" y="164" width="180" height="30"/>
+  <rect class="well" x="766" y="216" width="100" height="26"/>
+  <rect class="well" x="190" y="384" width="570" height="30"/>
+
+  <!-- caption lanes -->
+  <text class="cap" x="480" y="185" text-anchor="middle" data-l="8">ROOF SPRAY HEADER</text>
+  <path class="thin" d="M 480 194 V 202"/>
+  <text class="cap" x="816" y="236" text-anchor="middle" data-l="3">CLEAN GAS</text>
+  <path class="thin" d="M 816 242 V 284"/>
+  <text class="cap" x="242" y="405" text-anchor="middle" data-l="4">QUENCH</text>
+  <text class="cap" x="490" y="405" text-anchor="middle" data-l="5">PACKING STAGES P1–P4</text>
+  <text class="cap" x="720" y="405" text-anchor="middle" data-l="6">DEMISTER</text>
+
+  <text class="h2" x="612" y="466" data-l="15">LEGEND</text>
+  <text class="sch" x="660" y="490" data-l="16">PROCESS LINE</text>
+  <text class="sch" x="660" y="512" data-l="17">SIGNAL LINE</text>
+  <text class="sch" x="660" y="534" data-l="18">INSTRUMENT</text>
+  <text class="sch" x="660" y="556" data-l="19">CONTROL VALVE</text>
+  <text class="sch" x="660" y="578" data-l="20">STACK</text>
+
+  <text class="h2" x="848" y="466" data-i18n="pidEquipment">EQUIPMENT</text>
+  <text class="sch" x="848" y="490" data-l="9">P-101 RECIRC PUMP</text>
+  <text class="sch" x="848" y="512" data-l="10">T-102 NaOH TANK</text>
+  <text class="sch" x="848" y="534" data-l="11">P-102 NaOH DOSING</text>
+  <text class="sch" x="848" y="556" data-l="12">T-103 H₂SO₄ TANK</text>
+  <text class="sch" x="848" y="578" data-l="13">P-103 ACID TRIM</text>
+</svg>`
+  lab.ui.prepend(pid)
+
+  const $p = (id) => pid.querySelector('#' + id)
+  function paintPIDLabels() {
+    const L = tr('pidLabels')
+    for (const t of pid.querySelectorAll('text[data-l]')) t.textContent = L[Number(t.dataset.l)] ?? t.textContent
+  }
+  onLang(paintPIDLabels)
+  function updatePID() {
+    const v = lab.ui.querySelector('.lab-big .v')?.textContent ?? '—'
+    const st = lab.ui.querySelector('.lab-metric .lbl .st')?.textContent ?? ''
+    const sub = lab.ui.querySelector('.lab-sub')?.textContent ?? ''
+    const ppm = (sub.match(/([\d.]+)\s*ppmv/) || [])[1] ?? '—'
+    $p('pidLoad').textContent = tr('hudLoad') + ' ' + Math.round(load.value) + ' %'
+    $p('pidRem').textContent = tr('hudRem') + ' ' + v + ' %'
+    $p('pidState').textContent = tr('hudOutlet') + ' ' + ppm + ' ppmv · ' + (lab.broken ? tr('hudPumpTripped') : st)
+    pid.classList.toggle('dry', !!lab.broken)
+    pid.classList.toggle('frozen', !!lab.paused)
+  }
+  onLang(updatePID)
+  window.__view.register('pid', pid, updatePID)
+  paintPIDLabels()
+  updatePID()
+}
+
+// ------------------------------------------------------------------ language painter + mobile layout
+// One subscriber repaints every page-level string that the shared kit builds
+// from data (title, hero, slider, explanation, film beats). Everything else is
+// handled by data-i18n attributes or by the subscribers registered above.
+{
+  function paintStatic() {
+    const o = lab.o
+    o.prompt = tr('prompt'); o.title = tr('title'); o.sub = tr('sub')
+    lab.ui.querySelector('.lab-no').textContent = tr('no')
+    lab.ui.querySelector('.lab-title .t').textContent = o.title
+    lab.ui.querySelector('.lab-title i').textContent = o.sub
+    lab.ui.querySelector('.lab-prompt .txt').textContent = o.prompt
+    const pills = lab.ui.querySelectorAll('.lab-pills span')
+    for (let i = 0; i < pills.length; i++) pills[i].textContent = tr('pill' + i)
+    lab.hero({ label: tr('heroLabel'), unit: '%', max: 100, digits: 1 })
+    load.wrap.querySelector('.row span').textContent = tr('gasLoad')
+    const ends = load.wrap.querySelectorAll('.ends span')
+    ends[0].textContent = tr('turndown'); ends[1].textContent = tr('overload')
+    if (lab._break) lab._break.label = tr('modes.break')
+    lab.how(tr('howBody'), HOW_EQS)
+    paintFilm()
+    // hero() rebuilds the metric block, so restore its live values now instead
+    // of waiting for the next WebGL frame (which can be slow on a software GPU).
+    if ((lab._assembly ?? 0) < 0.0005) lab._update(0)
+  }
+  onLang(paintStatic)
+
+  // Mobile: fixed 3D canvas, compact top controls, bottom readout card and
+  // horizontally scrollable tool / mode strips. Drawings pan inside their own
+  // scroll container so no part of the schematic is lost off-screen.
+  const css = document.createElement('style')
+  css.textContent = `
+@media (min-width:761px) and (max-width:1080px) {
+  :root { --railw: clamp(220px,26vw,300px) }
+  .lab-rail { width:clamp(220px,26vw,300px) }
+  .lab-tools { font-size:11px; gap:0.35em }
+  .lab-tools button, .lab-tools a { padding:0.45em 0.75em }
+  .lab-demo { right:calc(5.8vw + clamp(220px,26vw,300px)) }
+}
+/* Narrow desktop: the readout column still caps the drawing width, so the
+   schematic type gets a compensating boost. These factors were measured
+   against every label pair in English and Traditional Chinese: no text
+   box intersects another, and every caption stays inside its backing well. */
+@media (min-width:761px) and (max-width:1200px) {
+  .lab-pid text { font-size:17.25px }
+  .lab-pid text.h1 { font-size:27.6px }
+  .lab-pid text.h2 { font-size:19.55px }
+  .lab-pid text.cap { font-size:17.25px }
+  .lab-pid text.sch { font-size:16.1px }
+  .lab-pid text.tag { font-size:13.8px }
+  .lab-2d text { font-size:15.4px }
+  .lab-2d text.t { font-size:13.2px }
+  .lab-2d text.h1 { font-size:23.1px }
+  .lab-2d text.h2 { font-size:17.6px }
+  /* The inlet caption sits immediately left of a paper-filled vessel outline
+     that is painted after it; keep it narrow enough that the degree sign and
+     the C are never covered by that fill. */
+  .lab-pid text.inlet, .lab-2d text.inlet { font-size:14px }
+}
+@media (max-width:760px) {
+  html, body { height:100dvh; overflow:hidden }
+  .lab-ui * { -webkit-tap-highlight-color:transparent }
+  .lab-prompt { left:12px; right:12px; top:calc(10px + env(safe-area-inset-top)); max-width:none; padding:0.45em 0.7em; font-size:12px }
+  .lab-pills, .lab-scale, .lab-beat, .lab-labels { display:none }
+  .lab-tools { position:absolute; left:12px; right:12px; top:calc(50px + env(safe-area-inset-top)); gap:0.35em; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; padding-bottom:4px; font-size:12px; scrollbar-width:none; -webkit-overflow-scrolling:touch; pointer-events:auto }
+  .lab-tools::-webkit-scrollbar, .lab-modes::-webkit-scrollbar { display:none }
+  .lab-tools > * { flex:0 0 auto; min-height:36px; padding:0.45em 0.8em; white-space:nowrap }
+  .lab-tools .lab-lang { padding:0 }
+  .lab-tools .lab-lang button { min-height:34px; padding:0.45em 0.65em }
+  .lab-demo { position:absolute; left:12px; right:12px; top:calc(96px + env(safe-area-inset-top)); bottom:auto; width:auto; padding:0.5em 0.8em 0.55em }
+  .lab-demo-sub { font-size:19px }
+  .lab-demo-sub span { font-size:0.56em; line-height:1.35 }
+  .lab-demo-meta { font-size:10px; align-items:center }
+  .lab-demo-close { font-size:11px; min-height:26px; padding:0.15em 0.6em }
+  .lab-rail { position:absolute; left:12px; right:12px; top:auto; bottom:calc(66px + env(safe-area-inset-bottom)); width:auto; display:block; pointer-events:none }
+  .lab-rail > .lab-side { position:static; width:100%; background:rgba(243,242,238,0.92); border:1px solid var(--line); border-radius:8px; padding:0.65em 0.85em; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); pointer-events:auto }
+  .lab-night .lab-rail > .lab-side { background:rgba(13,14,16,0.9) }
+  .lab-rail.how-open { top:auto; bottom:calc(66px + env(safe-area-inset-bottom)); max-height:56dvh; overflow-y:auto; overscroll-behavior:contain; padding:0; justify-content:flex-start; pointer-events:auto }
+  .lab-rail.how-open > .lab-how { position:static; width:100%; margin-top:0.8em; padding:0.7em 0.85em; background:rgba(243,242,238,0.92); border:1px solid var(--line); border-radius:8px }
+  .lab-rail.how-open .lab-how summary { background:transparent; padding-bottom:0.3em }
+  /* Shallow readout strip: the machine is framed into the upper middle of the
+     screen (see Lab._frame), so the card must not grow back over it. */
+  .lab-how { display:block; position:static; width:100%; font-size:10px; margin-top:0.3em }
+  .lab-no { display:none }
+  .lab-title { font-size:19px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .lab-title i { display:none }
+  .lab-metric { margin-top:0.15em }
+  .lab-metric .lbl { font-size:10px }
+  .lab-big { font-size:34px; line-height:1 }
+  .lab-big i { font-size:0.42em }
+  .lab-bar { margin:0.1em 0 0.25em }
+  .lab-sub { font-size:10px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .lab-ctl { margin-top:0.2em }
+  .lab-ctl .row { font-size:10px; margin-bottom:0 }
+  .lab-ctl input[type=range] { height:1.6em }
+  .lab-ctl input[type=range]::-webkit-slider-thumb { width:1.5em; height:1.5em; margin-top:-0.54em }
+  .lab-ctl input[type=range]::-moz-range-thumb { width:1.5em; height:1.5em }
+  .lab-ctl .ends { display:none }
+  .lab-modes { position:absolute; left:12px; right:12px; bottom:calc(8px + env(safe-area-inset-bottom)); display:flex; flex-wrap:nowrap; gap:0.35em; overflow-x:auto; padding-bottom:4px; font-size:12px; scrollbar-width:none; -webkit-overflow-scrolling:touch; pointer-events:auto }
+  .lab-modes button { flex:0 0 auto; min-height:38px; padding:0.5em 0.9em; white-space:nowrap; background:rgba(243,242,238,0.9) }
+  .lab-night .lab-modes button { background:rgba(13,14,16,0.9) }
+  .lab-modes kbd { display:none }
+  .lab-2d > svg, .lab-pid > svg { position:absolute; left:0; top:calc(112px + env(safe-area-inset-top)); transform:none; width:860px; max-width:none; height:auto }
+  .lab-2d.on, .lab-pid.on { overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y }
+  .lab-2d .panhint, .lab-pid .panhint { display:inline }
+  html.flatview .lab-rail .lab-no, html.flatview .lab-rail .lab-title { display:none }
+  .lab-film:not(.lab-embed) .lab-modes { left:12px; right:12px }
+}
+@media (max-width:760px) and (max-height:560px) {
+  .lab-rail > .lab-side .lab-sub, .lab-rail > .lab-side .lab-title, .lab-rail > .lab-side .lab-no { display:none }
+  .lab-big { font-size:30px }
+  /* Landscape phones lose the subtitle but keep a thin caption strip, so the
+     close control is still reachable in the middle of a tour. */
+  .lab-demo { top:calc(94px + env(safe-area-inset-top)); padding:0.25em 0.6em }
+  .lab-demo-sub { display:none }
+  .lab-demo-bar { margin-top:0.35em }
+  .lab-2d > svg, .lab-pid > svg { top:calc(104px + env(safe-area-inset-top)) }
+}
+`
+  document.head.appendChild(css)
 }
 
 lab.start()
+setLang(getLang())          // apply the persisted language (and paint every string) on boot
 
 </script>
 </body>
