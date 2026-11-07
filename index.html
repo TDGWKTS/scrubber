@@ -80,7 +80,7 @@ const I18N = {
     'film.breakBeat': 'Trip the pump.',
     'film.breakSub': 'The pads dry out: SO₂ breaks through in seconds.',
     ch1Title: 'The as-built machine',
-    ch1Text: 'A horizontal cross-flow wet scrubber: 7.2 m of bolted FRP vessel, a continuous sump skirt and an ID fan. 38,589 parts, 1.24 million triangles.',
+    ch1Text: 'A horizontal cross-flow wet scrubber: 7.2 m of bolted FRP vessel, a continuous sump skirt and an ID fan. 38,603 parts, 1.24 million triangles.',
     ch2Title: 'Dirty gas enters',
     ch2Text: '20,000 Nm³/h of gas at 150 °C enters the left duct. The inlet spray quenches it to its adiabatic saturation temperature, about 43 °C.',
     ch3Title: 'Cross-flow contact',
@@ -137,7 +137,7 @@ const I18N = {
     'film.breakBeat': '讓循環泵跳閘。',
     'film.breakSub': '填料變乾，SO₂ 在數秒內穿透。',
     ch1Title: '實機結構',
-    ch1Text: '臥式橫流濕式洗滌塔：7.2 米螺栓連接玻璃鋼殼體、連續塔底液槽與引風機。38,589 個零件，124 萬三角面。',
+    ch1Text: '臥式橫流濕式洗滌塔：7.2 米螺栓連接玻璃鋼殼體、連續塔底液槽與引風機。38,603 個零件，124 萬三角面。',
     ch2Title: '含硫煙氣進入',
     ch2Text: '20,000 Nm³/h、150 °C 的煙氣從左側風管進入。入口噴淋將其急冷至絕熱飽和溫度，約 43 °C。',
     ch3Title: '橫向錯流接觸',
@@ -1957,6 +1957,8 @@ lab.add(taper, { name: 'Tapered outlet transition', explode: [0.5, 0, 0], label:
 // axially from the taper (axis X); the volute's front side plate faces +Z and
 // the blue TEFC motor is DIRECT-COUPLED on it (axis along Z, pointing at the
 // operator), feet bolted to low rails of the shared frame — no tall pedestal.
+// One continuous shaft runs from the impeller hub through a flexible coupling
+// (with an open cage guard) into the motor's drive-end bearing: no gaps.
 // A rectangular cradle frame stands around the casing; discharge leaves the
 // volute top rear through a short upstand.
 const fan = new THREE.Group()
@@ -1977,9 +1979,34 @@ const fan = new THREE.Group()
   put(GEO.rbox(0.09, 0.09, 1.5, 0.01), galvM, 7.1, 3.72, 0.2)
   put(GEO.disc(0.26, 0.05, 0.01, 48), voluteM, 5.45, 2.72, 0.56, T2R)
   const yb = new THREE.Mesh(GEO.bolts(8, 0.2, 0.016, 0.03, {}), yellowM); yb.rotation.x = T2R; yb.position.set(5.45, 2.72, 0.59); fan.add(yb)
-  put(GEO.disc(0.17, 0.1, 0.02, 32), darkSteel, 5.85, 2.3, 0.58, T2R)
-  put(GEO.disc(0.055, 0.35, 0.01, 24), steelM, 5.85, 2.3, 0.85, T2R)
-  put(GEO.disc(0.35, 0.05, 0.01, 48), motorBlueM, 5.85, 2.3, 1.06, T2R)
+  // ---- drive train -------------------------------------------------------
+  // The impeller, shaft, coupling and motor share ONE axis: x = 5.85, y = 2.3,
+  // running along +Z out of the volute's front side plate. The shaft used to be
+  // a 0.35 m floating stub with a 45 mm gap at the fan hub and a 10 mm gap at
+  // the motor flange, so the motor read as disconnected. It is now ONE solid
+  // shaft from inside the volute (z = 0.46) to inside the drive-end bearing
+  // (z = 1.07), with a real flexible coupling and an open coupling guard.
+  const AX = [5.85, 2.3]
+  put(GEO.disc(0.17, 0.14, 0.02, 32), darkSteel, AX[0], AX[1], 0.60, T2R)      // bearing boss on the side plate: 0.53 .. 0.67
+  put(GEO.disc(0.105, 0.05, 0.008, 32), galvM, AX[0], AX[1], 0.685, T2R)        // shaft seal: 0.66 .. 0.71
+  put(GEO.disc(0.055, 0.61, 0.008, 24), steelM, AX[0], AX[1], 0.765, T2R)       // CONTINUOUS shaft: 0.46 .. 1.07
+  // flexible coupling: fan half, elastomeric spider, motor half
+  put(GEO.disc(0.125, 0.10, 0.012, 32), steelM, AX[0], AX[1], 0.775, T2R)       // 0.725 .. 0.825
+  put(GEO.disc(0.098, 0.07, 0.010, 32), darkSteel, AX[0], AX[1], 0.86, T2R)     // 0.825 .. 0.895
+  put(GEO.disc(0.125, 0.10, 0.012, 32), steelM, AX[0], AX[1], 0.945, T2R)       // 0.895 .. 0.995
+  for (const cz of [0.825, 0.995]) {
+    const cb = new THREE.Mesh(GEO.bolts(6, 0.098, 0.012, 0.022, {}), steelM)
+    cb.rotation.x = T2R; cb.position.set(AX[0], AX[1], cz); fan.add(cb)
+  }
+  // open cage guard: two end rings + six bars, so the coupled shaft stays visible
+  for (const gz of [0.715, 1.005]) put(GEO.tube(0.205, 0.19, 0.03, 32), galvM, AX[0], AX[1], gz, T2R)
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.29, 8), galvM)
+    bar.rotation.x = T2R; bar.position.set(AX[0] + 0.198 * Math.cos(a), AX[1] + 0.198 * Math.sin(a), 0.86)
+    fan.add(bar)
+  }
+  put(GEO.disc(0.35, 0.05, 0.01, 48), motorBlueM, 5.85, 2.3, 1.06, T2R)         // drive-end flange: shaft ends inside it
   put(GEO.disc(0.34, 0.95, 0.03, 48), motorBlueM, 5.85, 2.3, 1.56, T2R)
   const finGeos = []
   for (let i = 0; i < 28; i++) {
@@ -2006,7 +2033,7 @@ const fan = new THREE.Group()
   put(GEO.rbox(0.18, 0.24, 0.14, 0.02), yellowM, 6.7, 1.38, 2.12)
   const rb = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), redM); rb.rotation.x = T2R; rb.position.set(6.7, 1.38, 2.21); fan.add(rb)
 }
-lab.add(fan, { name: 'Centrifugal ID fan', explode: [0.9, 0, 0], label: 'ID fan · direct-coupled motor', at: [5.85, 3.95, 0.4], value: () => 'centrifugal \u00b7 draws the scrubbed gas', count: 52 })
+lab.add(fan, { name: 'Centrifugal ID fan', explode: [0.9, 0, 0], label: 'ID fan · flexible-coupled motor', at: [5.85, 3.95, 0.4], value: () => 'centrifugal \u00b7 draws the scrubbed gas', count: 66 })
 
 // ------------------------------------------------------------------ internals: quench zone, 4 cross-flow stages, demister
 const STAGE_X = [-1.95, -0.65, 0.65, 1.95]     // stage centre lines (m)
