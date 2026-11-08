@@ -72,7 +72,7 @@ const I18N = {
     toolPlay: 'Play the guided tour (D)', toolRestart: 'Restart the demo',
     toolQuality: 'Cycle render quality (Q)', tool2d: 'Switch to the 2D side elevation (2)',
     tool3d: 'Return to the 3D model (2)', toolPid: 'Open the P&I diagram (P)', toolPidOff: 'Close the P&I diagram (P)',
-    toolLang: 'Switch language', toolManual: 'Open the user manual (M)',
+    toolLang: 'Switch language', toolManual: 'Open the full-screen user manual (M)',
     hudLoad: 'GAS LOAD', hudRem: 'SO₂ REMOVAL', hudOutlet: 'OUTLET', hudPumpTripped: 'PUMP TRIPPED',
     swipeHint: 'SWIPE TO PAN →',
     manualKicker: 'NO. 05 · AS BUILT · OPERATOR GUIDE',
@@ -110,7 +110,7 @@ const I18N = {
         ['2D view / 3D view', 'Toggles the dimensioned side elevation (<kbd>2</kbd>). The label always shows what it will switch to.'],
         ['P&amp;I', 'Toggles the process &amp; instrumentation diagram (<kbd>P</kbd>).'],
         ['EN / 繁中', 'Switches the interface, chapter captions and both drawings between English and Traditional Chinese (<kbd>G</kbd>). The choice is saved in this browser.'],
-        ['Manual', 'Opens this guide (<kbd>M</kbd>). <kbd>Esc</kbd> or the × button closes it.'],
+        ['Manual', 'Opens this full-screen guide (<kbd>M</kbd>). <kbd>Esc</kbd> or the <b>Close</b> button returns to the machine.'],
       ] },
       { id: 'views', h: '4 · 2D elevation & P&I diagram', p: [
         'Both flat drawings are live SVG, not screenshots: the HUD strip carries the current gas load, SO₂ removal and outlet, and the animated dashed flow paths follow the solver. While a drawing is open the WebGL renderer is bypassed, which also makes it the lightest way to read the machine.',
@@ -241,7 +241,7 @@ const I18N = {
     toolPlay: '播放引導演示 (D)', toolRestart: '重新播放演示',
     toolQuality: '切換渲染畫質 (Q)', tool2d: '切換到二維側視圖 (2)',
     tool3d: '返回三維模型 (2)', toolPid: '打開管道儀表圖 (P)', toolPidOff: '關閉管道儀表圖 (P)',
-    toolLang: '切換語言', toolManual: '打開使用手冊 (M)',
+    toolLang: '切換語言', toolManual: '打開全螢幕使用手冊 (M)',
     hudLoad: '氣量負荷', hudRem: 'SO₂ 去除率', hudOutlet: '出口', hudPumpTripped: '泵已跳閘',
     swipeHint: '← 左右滑動查看 →',
     manualKicker: '第 05 號 · 實機還原 · 操作指南',
@@ -279,7 +279,7 @@ const I18N = {
         ['二維視圖 / 三維視圖', '切換標註側視圖（<kbd>2</kbd>）。按鈕文字永遠顯示「按下後會切到哪個視圖」。'],
         ['P&amp;I 圖', '切換管道儀表流程圖（<kbd>P</kbd>）。'],
         ['EN / 繁中', '切換介面、導覽字幕與兩張工程圖的語言（<kbd>G</kbd>）。選擇會儲存在此瀏覽器。'],
-        ['手冊', '開啟本指南（<kbd>M</kbd>）。按 <kbd>Esc</kbd> 或 × 關閉。'],
+        ['手冊', '開啟全螢幕指南（<kbd>M</kbd>）。按 <kbd>Esc</kbd> 或 <b>關閉</b> 按鈕返回模型。'],
       ] },
       { id: 'views', h: '4 · 二維側視圖與 P&amp;I 圖', p: [
         '兩張工程圖都是即時 SVG，而非截圖：圖上的 HUD 顯示當前氣量負荷、SO₂ 去除率與出口讀數，流動虛線也隨求解器變化。開啟工程圖時會跳過 WebGL 繪製，因此也是效能最輕的瀏覽方式。',
@@ -3653,66 +3653,75 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
 // ------------------------------------------------------------------ user manual
 // The toolbar used to link to crossflow-scrubber-manual.html, which does not
 // exist (404). This is the real manual: a self-contained, bilingual, keyboard
-// accessible dialog that describes every control on the page. Content lives in
-// I18N[lang].manualSections so a language switch repaints it in place.
+// accessible FULL-SCREEN reading page describing every control. Content lives
+// in I18N[lang].manualSections so a language switch repaints it in place.
 {
   const css = document.createElement('style')
   css.textContent = `
 .lab-manual { position:fixed; inset:0; z-index:60; display:none; pointer-events:auto; font-family:var(--sans); color:var(--ink) }
 .lab-manual.open { display:block }
-.lm-backdrop { position:absolute; inset:0; background:rgba(18,18,17,.48); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px) }
-.lm-sheet { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(920px,calc(100vw - 32px)); max-height:min(88dvh,900px); display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--line); border-radius:10px; box-shadow:0 24px 90px rgba(0,0,0,.28); overflow:hidden }
-.lm-hd { display:flex; gap:1em; align-items:flex-start; justify-content:space-between; padding:1.1em 1.4em .9em; border-bottom:1px solid var(--line) }
-.lm-kicker { font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--mute) }
-.lm-hd h2 { font-family:var(--serif); font-weight:400; font-size:34px; line-height:1; margin:.22em 0 .18em }
-.lm-hd p { margin:0; font-size:12px; color:var(--mute); line-height:1.5; max-width:66ch }
-.lm-close { flex:0 0 auto; font:inherit; font-size:22px; line-height:1; width:36px; height:36px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:50%; cursor:pointer }
+/* A full-screen reading page, not a floating card. Small type inside a 920px
+   modal was cramped; the whole viewport is now given over to the text. */
+html.manual-open, html.manual-open body { overflow:hidden; overscroll-behavior:none }
+.lm-backdrop { display:none } /* kept in the DOM as a [data-lm-close] target */
+.lm-sheet { position:absolute; inset:0; width:100%; height:100%; max-height:none; transform:none; display:flex; flex-direction:column; background:var(--paper); border:0; border-radius:0; box-shadow:none; overflow:hidden }
+.lm-hd { flex:0 0 auto; display:flex; gap:1.5em; align-items:flex-start; justify-content:space-between; padding:calc(1.5em + env(safe-area-inset-top)) clamp(20px,4vw,56px) 1.25em; border-bottom:1px solid var(--line); background:var(--paper) }
+.lm-kicker { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--mute) }
+.lm-hd h2 { font-family:var(--serif); font-weight:400; font-size:clamp(34px,4vw,52px); line-height:1.02; margin:.28em 0 .24em; letter-spacing:-.01em }
+.lm-hd p { margin:0; font-size:14px; color:var(--mute); line-height:1.6; max-width:72ch }
+.lm-close { flex:0 0 auto; display:inline-flex; align-items:center; gap:.55em; font:inherit; font-size:13px; line-height:1; padding:.7em 1em; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:999px; cursor:pointer; white-space:nowrap }
+.lm-close-x { font-size:20px; line-height:.8 }
 .lm-close:hover, .lm-close:focus-visible { border-color:var(--accent); color:var(--accent); outline:none }
 .lm-wrap { display:flex; flex:1; min-height:0 }
-.lm-toc { flex:0 0 196px; padding:1em .8em 1em 1.4em; border-right:1px solid var(--line); overflow-y:auto; scrollbar-width:thin }
-.lm-toc > b { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--mute); margin-bottom:.8em }
-.lm-toc button { display:block; width:100%; text-align:left; font:inherit; font-size:12px; line-height:1.35; color:var(--mute); background:transparent; border:0; border-left:2px solid transparent; padding:.42em .6em; cursor:pointer }
-.lm-toc button:hover, .lm-toc button:focus-visible { color:var(--ink); outline:none }
-.lm-toc button.act { color:var(--accent); border-left-color:var(--accent) }
-.lm-body { flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain; padding:1.15em 1.6em 2.4em; font-size:13px; line-height:1.65; scrollbar-width:thin }
-.lm-sec { margin:0 0 2.2em; scroll-margin-top:1em }
-.lm-sec h3 { font-family:var(--serif); font-weight:400; font-size:24px; line-height:1.15; margin:0 0 .55em }
-.lm-sec p { margin:0 0 .8em; color:#4d4b47 }
-.lab-night .lm-sec p, .lab-night .lm-rows .v { color:#bdbab2 }
-.lm-sec ol { margin:0 0 1em; padding-left:1.5em }
-.lm-sec li { margin-bottom:.5em; color:#4d4b47 }
-.lab-night .lm-sec li { color:#bdbab2 }
+.lm-toc { flex:0 0 clamp(220px,20vw,290px); padding:1.8em 1.2em 2em clamp(20px,4vw,56px); border-right:1px solid var(--line); overflow-y:auto; scrollbar-width:thin; background:var(--paper) }
+.lm-toc > b { display:block; font-family:var(--mono); font-size:11px; letter-spacing:.12em; color:var(--mute); margin-bottom:1.1em }
+.lm-toc button { display:block; width:100%; text-align:left; font:inherit; font-size:13.5px; line-height:1.4; color:var(--mute); background:transparent; border:0; border-left:2px solid transparent; padding:.55em .7em; border-radius:0 4px 4px 0; cursor:pointer }
+.lm-toc button:hover, .lm-toc button:focus-visible { color:var(--ink); background:rgba(0,0,0,.03); outline:none }
+.lab-night .lm-toc button:hover { background:rgba(255,255,255,.05) }
+.lm-toc button.act { color:var(--accent); border-left-color:var(--accent); background:rgba(228,87,46,.07) }
+.lm-body { flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain; padding:2.4em clamp(24px,5vw,72px) 6em; font-size:15.5px; line-height:1.8; scrollbar-width:thin }
+.lm-sec { max-width:78ch; margin:0 auto 3.4em; scroll-margin-top:1em }
+.lm-sec h3 { font-family:var(--serif); font-weight:400; font-size:clamp(26px,2.4vw,34px); line-height:1.2; margin:0 0 .7em; padding-bottom:.4em; border-bottom:1px solid var(--line) }
+.lm-sec p { margin:0 0 1.1em; color:#4d4b47 }
+.lab-night .lm-sec p, .lab-night .lm-rows .v, .lab-night .lm-sec li, .lab-night .lm-note { color:#c3c0b8 }
+.lm-sec ol { margin:0 0 1.3em; padding-left:1.6em }
+.lm-sec li { margin-bottom:.7em; padding-left:.25em; color:#4d4b47 }
 .lm-sec b { color:var(--ink); font-weight:600 }
-.lm-sec kbd { font-family:var(--mono); font-size:.86em; background:rgba(0,0,0,.05); border:1px solid var(--line); border-radius:3px; padding:.05em .4em; white-space:nowrap }
+.lm-sec kbd { font-family:var(--mono); font-size:.86em; background:rgba(0,0,0,.05); border:1px solid var(--line); border-radius:3px; padding:.1em .45em; white-space:nowrap }
 .lab-night .lm-sec kbd { background:rgba(255,255,255,.07) }
-.lm-rows { display:grid; grid-template-columns:minmax(140px,32%) 1fr; border-top:1px solid var(--line); margin:.2em 0 1em }
-.lm-rows > div { padding:.5em .65em; border-bottom:1px solid var(--line) }
-.lm-rows .k { font-size:12px; font-weight:600; color:var(--ink) }
-.lm-rows .v { font-size:12.5px; color:#4d4b47 }
-.lm-keys { grid-template-columns:minmax(120px,24%) 1fr }
-.lm-keys .k { font-family:var(--mono); font-weight:500 }
-.lm-note { border-left:2px solid var(--accent); padding:.15em 0 .15em .9em; color:var(--mute); font-size:12px; line-height:1.6; margin-top:1em }
-.lm-ft { display:flex; justify-content:space-between; align-items:center; gap:1em; padding:.7em 1.4em; border-top:1px solid var(--line); font-size:11px; color:var(--mute) }
+.lm-rows { display:grid; grid-template-columns:minmax(170px,28%) 1fr; border-top:1px solid var(--line); margin:.4em 0 1.6em }
+.lm-rows > div { padding:.75em .8em; border-bottom:1px solid var(--line) }
+.lm-rows .k { font-size:13.5px; font-weight:600; line-height:1.5; color:var(--ink) }
+.lm-rows .v { font-size:14px; line-height:1.7; color:#4d4b47 }
+.lm-keys { grid-template-columns:minmax(120px,22%) 1fr }
+.lm-keys .k { font-family:var(--mono); font-weight:500; font-size:13px }
+.lm-note { border-left:3px solid var(--accent); padding:.35em 0 .35em 1.1em; color:var(--mute); font-size:13.5px; line-height:1.75; margin-top:1.4em }
+.lm-ft { flex:0 0 auto; display:flex; justify-content:space-between; align-items:center; gap:1em; padding:.85em clamp(20px,4vw,56px) calc(.85em + env(safe-area-inset-bottom)); border-top:1px solid var(--line); font-size:12px; color:var(--mute); background:var(--paper) }
 .lm-ft kbd { font-family:var(--mono); font-size:.95em }
 @media (max-width:760px) {
-  .lm-sheet { width:calc(100vw - 16px); max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:8px }
-  .lm-hd { padding:.8em 1em .65em }
-  .lm-hd h2 { font-size:27px }
-  .lm-hd p { font-size:11px }
-  .lm-close { width:32px; height:32px; font-size:19px }
+  .lm-hd { gap:.8em; padding:calc(1em + env(safe-area-inset-top)) 18px .85em }
+  .lm-hd h2 { font-size:30px }
+  .lm-hd p { font-size:12.5px; line-height:1.5; max-width:46ch }
+  .lm-kicker { font-size:10px }
+  .lm-close { padding:.6em .75em; font-size:12px }
+  .lm-close-t { display:none }
+  .lm-close-x { font-size:19px }
   .lm-wrap { flex-direction:column }
-  .lm-toc { flex:0 0 auto; display:flex; align-items:center; gap:.35em; padding:.55em .8em; border-right:0; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; scrollbar-width:none }
+  .lm-toc { flex:0 0 auto; display:flex; align-items:center; gap:.35em; padding:.6em 14px; border-right:0; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; scrollbar-width:none }
   .lm-toc::-webkit-scrollbar { display:none }
   .lm-toc > b { display:none }
-  .lm-toc-list { display:flex; gap:.35em }
-  .lm-toc button { width:auto; flex:0 0 auto; white-space:nowrap; font-size:11px; border:1px solid var(--line); border-radius:999px; padding:.35em .7em }
-  .lm-toc button.act { border-color:var(--accent) }
-  .lm-body { padding:1em 1em 1.8em; font-size:12.5px }
-  .lm-sec h3 { font-size:21px }
-  .lm-rows { grid-template-columns:1fr }
-  .lm-rows .k { padding-bottom:0; border-bottom:0 }
-  .lm-rows .v { padding-top:.1em }
-  .lm-ft { padding:.55em 1em }
+  .lm-toc-list { display:flex; gap:.4em }
+  .lm-toc button { width:auto; flex:0 0 auto; white-space:nowrap; font-size:12px; border:1px solid var(--line); border-radius:999px; padding:.45em .8em }
+  .lm-toc button:hover, .lm-toc button:focus-visible { background:rgba(0,0,0,.04) }
+  .lm-toc button.act { border-color:var(--accent); background:rgba(228,87,46,.09) }
+  .lm-body { padding:1.5em 18px 4em; font-size:15px; line-height:1.78 }
+  .lm-sec { max-width:none; margin:0 0 2.8em }
+  .lm-sec h3 { font-size:25px }
+  .lm-rows { grid-template-columns:1fr; margin:.3em 0 1.4em }
+  .lm-rows > div { padding:.6em .2em }
+  .lm-rows .k { padding-bottom:0; border-bottom:0; font-size:13.5px }
+  .lm-rows .v { padding-top:.15em; font-size:14px }
+  .lm-ft { padding:.7em 18px calc(.7em + env(safe-area-inset-bottom)) }
   .lm-foot-hint { display:none }
 }
 `
@@ -3727,7 +3736,7 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
   dlg.innerHTML = '<div class="lm-backdrop" data-lm-close></div>' +
     '<div class="lm-sheet">' +
       '<header class="lm-hd"><div><span class="lm-kicker"></span><h2 id="labManualTitle"></h2><p class="lm-sub"></p></div>' +
-      '<button type="button" class="lm-close" data-lm-close><span aria-hidden="true">&#215;</span></button></header>' +
+      '<button type="button" class="lm-close" data-lm-close><span class="lm-close-x" aria-hidden="true">&#215;</span><span class="lm-close-t"></span></button></header>' +
       '<div class="lm-wrap"><nav class="lm-toc"><b></b><div class="lm-toc-list"></div></nav>' +
       '<div class="lm-body"></div></div>' +
       '<footer class="lm-ft"><span class="lm-foot-text"></span><span class="lm-foot-hint"></span></footer>' +
@@ -3751,6 +3760,7 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
     dlg.querySelector('.lm-sub').textContent = tr('manualSub')
     closeBtn.setAttribute('aria-label', tr('manualClose'))
     closeBtn.title = tr('toolCloseManual')
+    dlg.querySelector('.lm-close-t').textContent = tr('manualClose')
     dlg.querySelector('.lm-toc > b').textContent = tr('manualToc')
     dlg.querySelector('.lm-toc').setAttribute('aria-label', tr('manualToc'))
     dlg.querySelector('.lm-foot-text').textContent = tr('manualFoot')
