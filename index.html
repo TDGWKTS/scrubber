@@ -72,9 +72,121 @@ const I18N = {
     toolPlay: 'Play the guided tour (D)', toolRestart: 'Restart the demo',
     toolQuality: 'Cycle render quality (Q)', tool2d: 'Switch to the 2D side elevation (2)',
     tool3d: 'Return to the 3D model (2)', toolPid: 'Open the P&I diagram (P)', toolPidOff: 'Close the P&I diagram (P)',
-    toolLang: 'Switch language', toolManual: 'Open the control manual',
+    toolLang: 'Switch language', toolManual: 'Open the user manual (M)',
     hudLoad: 'GAS LOAD', hudRem: 'SO₂ REMOVAL', hudOutlet: 'OUTLET', hudPumpTripped: 'PUMP TRIPPED',
     swipeHint: 'SWIPE TO PAN →',
+    manualKicker: 'NO. 05 · AS BUILT · OPERATOR GUIDE',
+    manualTitle: 'User manual',
+    manualSub: 'From the first orbit to the physics behind the numbers — every control on this page, explained.',
+    manualToc: 'CONTENTS',
+    manualClose: 'Close manual',
+    toolCloseManual: 'Close the user manual (Esc)',
+    manualHint: '<kbd>M</kbd> toggle · <kbd>Esc</kbd> close',
+    manualFoot: 'Cross-flow scrubber · As built — Machine Skill × Anatomy. An interactive teaching model, not a plant operating procedure.',
+    manualSections: [
+      { id: 'quick', h: '1 · Quick start', list: [
+        'Press <b>Play demo</b> and watch the seven-chapter tour. It drives the camera, the cutaway and the gas load for you; press <b>Esc</b> or <b>×</b> at any time to take control back.',
+        'Drag the 3D model to orbit it. Scroll or pinch to zoom; right-drag or two-finger drag to pan.',
+        'Move the <b>Gas load</b> slider (40–110 %) and watch SO₂ removal, outlet concentration and pressure drop recompute on every frame.',
+        'Press <b>Trip the pump</b> to see the failure develop, then press it again to recover.',
+        'Open <b>2D view</b> or <b>P&amp;I</b> for dimensioned drawings, or <b>Labels</b> to name the parts.',
+      ] },
+      { id: 'about', h: '2 · What this page is', p: [
+        'A measured 3D reconstruction of a horizontal cross-flow wet scrubber, built from site photographs: grey bolted FRP panels, a continuous sump skirt, a tapered outlet transition and a centrifugal ID fan with a flexible-coupled blue motor. 38,603 parts, about 1.24 million triangles.',
+        'Unlike a canned animation, every figure is produced by a live solver — psychrometric quench, Onda wetted area, Eckert pressure drop and four-stage mass transfer. The 3D model, the instrument rail, the 2D elevation and the P&amp;I diagram all read the same state.',
+      ], rows: [
+        ['Design gas', '20,000 Nm³/h at 150 °C, 2,000 ppmv SO₂'],
+        ['Vessel', '7.2 m × 2.4 m × 2.6 m, bolted FRP, horizontal'],
+        ['Contact', '4 × 0.6 m caustic-wetted packing stages, gas crossing sideways'],
+        ['Duty', '≈ 97.5 % SO₂ removal at 100 % gas load'],
+        ['Recirculation', '52 m³/h at 18 m head, alkaline sump at pH 8.5'],
+      ] },
+      { id: 'toolbar', h: '3 · The top toolbar', p: [
+        'The strip under the title bar is the main control row. On a phone it scrolls sideways — swipe it to reach the far-right buttons.',
+      ], rows: [
+        ['▶ Play / Pause / Resume demo', 'Starts, pauses or resumes the seven-chapter guided tour. Shortcut <kbd>D</kbd>.'],
+        ['↻', 'Restarts the tour from chapter 01 and restores the saved camera, modes and gas load.'],
+        ['Quality · High / Balanced / Lite', 'Cycles render quality (<kbd>Q</kbd>). An automatic downgrade is labelled <i>(auto)</i>; choose <b>Lite</b> on a slower GPU.'],
+        ['2D view / 3D view', 'Toggles the dimensioned side elevation (<kbd>2</kbd>). The label always shows what it will switch to.'],
+        ['P&amp;I', 'Toggles the process &amp; instrumentation diagram (<kbd>P</kbd>).'],
+        ['EN / 繁中', 'Switches the interface, chapter captions and both drawings between English and Traditional Chinese (<kbd>G</kbd>). The choice is saved in this browser.'],
+        ['Manual', 'Opens this guide (<kbd>M</kbd>). <kbd>Esc</kbd> or the × button closes it.'],
+      ] },
+      { id: 'views', h: '4 · 2D elevation & P&I diagram', p: [
+        'Both flat drawings are live SVG, not screenshots: the HUD strip carries the current gas load, SO₂ removal and outlet, and the animated dashed flow paths follow the solver. While a drawing is open the WebGL renderer is bypassed, which also makes it the lightest way to read the machine.',
+      ], rows: [
+        ['2D side elevation', '1:50 as-built elevation with 14 printed labels: inlet duct, quench, four packing stages, demister, sump, dosing skid, tapered outlet, ID fan and blue motor.'],
+        ['P&amp;I diagram', 'Process lines, dashed signal lines, instrument bubbles, control valves and equipment tags P-101 … P-103 / T-102 … T-103, plus a legend and the DCS / PLC hand-off.'],
+        ['Panning', 'When the drawing is wider than the window, swipe horizontally inside it. A <b>SWIPE TO PAN</b> hint appears to remind you.'],
+        ['Labels', 'All part names are printed on the drawing at once. Orange hover highlighting belongs to the 3D view only.'],
+        ['Switching', 'The three views are mutually exclusive: 2D, P&amp;I and 3D. Click the active toggle again (or press its shortcut) to return to the model.'],
+      ] },
+      { id: 'modes', h: '5 · The bottom control pills', p: [
+        'These modes change how the machine is displayed or how the solver runs. They can be combined — for example <b>Cut away</b> + <b>Slow</b> + <b>Labels</b>.',
+      ], rows: [
+        ['Pause / Run', 'Freezes or resumes the solver clock (<kbd>Space</kbd>). The 3D view keeps orbiting while paused.'],
+        ['Explode', 'Separates the assembled parts along their build axes (<kbd>E</kbd>).'],
+        ['Cut away', 'Sections the FRP shell so the four packing stages and roof spray headers become visible (<kbd>C</kbd>).'],
+        ['X-ray', 'Renders the shell translucent to reveal internal pipework (<kbd>X</kbd>).'],
+        ['Slow', 'Runs the clock at a fraction of normal speed — useful for watching a pump trip (<kbd>S</kbd>).'],
+        ['Labels', 'Shows 3D leader-line labels on desktop (<kbd>L</kbd>). On a phone it opens the 2D elevation instead, where every name is legible.'],
+        ['Trip the pump', 'Stops liquor circulation: the pads dry out and SO₂ breaks through in seconds (<kbd>B</kbd>). Press again to restore.'],
+      ] },
+      { id: 'readouts', h: '6 · Live readouts & gas load', p: [
+        'The right-hand column — a compact card at the bottom on phones — is the instrument panel. It is driven by the solver every frame, so nothing on it is a recorded value.',
+      ], rows: [
+        ['SO₂ removal', 'The headline figure. About 97.5 % at design load; it falls when gas load rises or the liquor stops.'],
+        ['Outlet', 'Stack concentration in ppmv with a plain-language state: <i>in compliance</i>, <i>absorbing</i>, <i>breaking through</i> or <i>pump tripped</i>. Orange figures mean out of compliance.'],
+        ['Gas load', 'The 40–110 % slider. <b>Turndown</b> and <b>Overload</b> mark the ends; quench temperature, pressure drop, K<sub>G</sub>a and removal all respond.'],
+        ['pH / ORP', 'Alkaline sump target pH 8.5, acid-trimmed outlet pH 7, oxidation-reduction potential ≈ +320 mV. These sag <i>before</i> SO₂ breaks through — that is how an operator sees the failure coming.'],
+        ['How it is computed', 'An expandable derivation of the psychrometric, Onda, Eckert and NTU correlations, including the simplifications used.'],
+      ], note: 'On a phone the readout card is hidden while the 2D or P&I drawing is open, because it would cover the lower tags. Close the drawing to bring it back.' },
+      { id: 'demo', h: '7 · The guided tour', p: [
+        'The tour is a seven-chapter camera and state timeline. It saves your camera, mode toggles, pump state and gas load on entry and restores all of them when it ends.',
+      ], list: [
+        '<b>01</b> The as-built machine · <b>02</b> Dirty gas enters · <b>03</b> Cross-flow contact · <b>04</b> Removal compounds stage by stage · <b>05</b> Change the gas load · <b>06</b> Trip the recirculation pump · <b>07</b> Restore and explore.',
+        'Play, pause and resume with the toolbar button or <kbd>D</kbd>; <b>↻</b> restarts from the beginning.',
+        '<kbd>Esc</kbd> or the <b>×</b> control ends the tour at any point and restores your previous view. On phones the caption sits in the bottom slot so it never covers the machine.',
+      ] },
+      { id: 'labels', h: '8 · Labels & orange highlighting', p: [
+        'On desktop, part labels are drawn as leader lines anchored to a small black dot on the geometry. Hover either end of the line — the relation works in both directions:',
+      ], list: [
+        'Hover the <b>black anchor dot</b> → that label text, its leader line and the dot all turn orange.',
+        'Hover the <b>label text</b> → the same three elements turn orange, so you can always find the part it points at.',
+        'Move the pointer away and everything returns to black. Only one label highlights at a time, which keeps dense areas readable.',
+      ], p2: [
+        'On phones the 3D leader lines are hidden — they cannot be laid out legibly on a narrow screen. The <b>Labels</b> button opens the 2D elevation instead, where all names are printed on the drawing.',
+      ] },
+      { id: 'keys', h: '9 · Keyboard shortcuts', p: [
+        'Shortcuts are ignored while a text input has focus or while this manual is open.',
+      ], keys: [
+        ['D', 'Play / pause / resume the guided tour'],
+        ['Q', 'Cycle render quality'],
+        ['G', 'Toggle EN / 繁中'],
+        ['M', 'Open or close this manual'],
+        ['2', 'Toggle the 2D side elevation'],
+        ['P', 'Toggle the P&I diagram'],
+        ['L', '3D part labels (opens the 2D drawing on phones)'],
+        ['E / C / X / S', 'Explode / Cut away / X-ray / Slow'],
+        ['B', 'Trip or restore the recirculation pump'],
+        ['Space', 'Pause or resume the solver'],
+        ['Esc', 'End the guided tour, or close this manual'],
+        ['Drag / scroll', 'Orbit / zoom the 3D model'],
+      ] },
+      { id: 'mobile', h: '10 · Phones, tablets & performance', p: [
+        'The phone layout frames the 3D machine in the upper middle and moves the readouts into a bottom card. Both the top tool strip and the bottom control pills scroll horizontally, so nothing is cut off.',
+      ], rows: [
+        ['Guided tour', 'The caption moves into the bottom slot for the length of the tour and the readout card steps aside; everything returns afterwards.'],
+        ['2D / P&amp;I', 'The readout card is hidden while either drawing is open. Swipe inside the drawing to pan; swipe the top strip sideways to reach the Manual button.'],
+        ['Performance', '<b>Quality · Lite</b> drops post-processing for weaker GPUs, and the 2D / P&amp;I views skip WebGL entirely while still running the solver.'],
+        ['Language', '<b>EN / 繁中</b> applies to the UI, the chapter captions and both drawings, and persists in this browser.'],
+        ['Accessibility', 'Every control is a real button with an accessible name; this manual traps keyboard focus while open and returns it to the Manual button on close.'],
+      ] },
+      { id: 'physics', h: '11 · How the numbers are computed', p: [
+        'Gas at 150 °C is quenched to its adiabatic saturation temperature (≈ 43 °C, Tetens vapour pressure solved by bisection). It then crosses four 0.6 m packing stages in series; each removes a fraction of what reaches it, so <b>η = 1 − Π(1 − η<sub>stage</sub>)</b>. NTU per stage = K<sub>G</sub>a·t/u<sub>G</sub>, with K<sub>G</sub>a anchored to published caustic-scrubber values for 50 mm Pall rings and rescaled every frame by gas rate, Onda wetted area, liquor rate and wetting state.',
+        'Pressure drop uses the Eckert generalised correlation over the full 2.4 m of pad plus quench and demister allowances. NaOH dosing is stoichiometric × 1.15 on absorbed SO₂; a dilute H₂SO₄ trim neutralises alkaline carry-over back toward pH 7. Pump power is ρgQH/η at 52 m³/h and 18 m.',
+      ], note: 'Simplified: plug flow across the pads, constant pH, uniform spray distribution, no SO₃ or fly-ash load. This is an educational model — read the <b>How it is computed</b> panel for the full derivation, and never use these figures as a plant operating procedure.' },
+    ],
     'film.runBeat': 'It runs on real chemistry.',
     'film.runSub': 'Gas crosses four caustic-wetted pads sideways; removal compounds stage by stage.',
     'film.breakBeat': 'Trip the pump.',
@@ -129,9 +241,121 @@ const I18N = {
     toolPlay: '播放引導演示 (D)', toolRestart: '重新播放演示',
     toolQuality: '切換渲染畫質 (Q)', tool2d: '切換到二維側視圖 (2)',
     tool3d: '返回三維模型 (2)', toolPid: '打開管道儀表圖 (P)', toolPidOff: '關閉管道儀表圖 (P)',
-    toolLang: '切換語言', toolManual: '打開操作手冊',
+    toolLang: '切換語言', toolManual: '打開使用手冊 (M)',
     hudLoad: '氣量負荷', hudRem: 'SO₂ 去除率', hudOutlet: '出口', hudPumpTripped: '泵已跳閘',
     swipeHint: '← 左右滑動查看 →',
+    manualKicker: '第 05 號 · 實機還原 · 操作指南',
+    manualTitle: '使用手冊',
+    manualSub: '從第一次旋轉模型，到數字背後的物理運算 —— 完整說明本頁每一個控制項。',
+    manualToc: '目錄',
+    manualClose: '關閉手冊',
+    toolCloseManual: '關閉使用手冊 (Esc)',
+    manualHint: '<kbd>M</kbd> 開關 · <kbd>Esc</kbd> 關閉',
+    manualFoot: '橫流式洗滌塔 · 實機還原 — Machine Skill × Anatomy。本頁為互動式教學模型，並非電廠操作規程。',
+    manualSections: [
+      { id: 'quick', h: '1 · 快速上手', list: [
+        '按下 <b>播放演示</b>，觀看七段引導導覽。相機、剖切與氣量負荷會自動帶領；任何時候按 <b>Esc</b> 或 <b>×</b> 即可取回控制權。',
+        '拖曳 3D 模型可旋轉視角；滾輪或雙指縮放；右鍵拖曳或雙指拖曳可平移。',
+        '拉動 <b>氣量負荷</b> 滑桿（40–110 %），觀察 SO₂ 去除率、出口濃度與壓降逐幀重算。',
+        '按 <b>泵跳閘</b> 觀察故障如何發生，再按一次即可復原。',
+        '開啟 <b>二維視圖</b> 或 <b>P&amp;I 圖</b> 查看標註工程圖，或按 <b>標註</b> 顯示零件名稱。',
+      ] },
+      { id: 'about', h: '2 · 本頁是什麼', p: [
+        '依現場照片測繪重建的臥式橫流濕式洗滌塔 3D 模型：灰色螺栓連接玻璃鋼板、連續塔底液槽、漸縮出口過渡段，以及帶撓性聯軸器藍色電機的離心引風機。共 38,603 個零件、約 124 萬三角面。',
+        '與預錄動畫不同，所有數字都由即時求解器產生 —— 絕熱急冷、Onda 潤濕面積、Eckert 壓降與四級傳質。3D 模型、儀表欄、二維側視圖與 P&amp;I 圖全部讀取同一份狀態。',
+      ], rows: [
+        ['設計煙氣', '20,000 Nm³/h、150 °C、SO₂ 2,000 ppmv'],
+        ['殼體', '7.2 m × 2.4 m × 2.6 m，臥式螺栓連接玻璃鋼'],
+        ['接觸段', '4 × 0.6 m 鹼液潤濕填料層，煙氣橫向穿過'],
+        ['性能', '100 % 氣量負荷下 SO₂ 去除率約 97.5 %'],
+        ['循環液', '52 m³/h、揚程 18 m，鹼性塔底液槽 pH 8.5'],
+      ] },
+      { id: 'toolbar', h: '3 · 頂部工具列', p: [
+        '標題下方的一排按鈕是主要控制區。在手機上可橫向滑動，向右滑即可看到最右側的按鈕。',
+      ], rows: [
+        ['▶ 播放 / 暫停 / 繼續演示', '啟動、暫停或繼續七段引導導覽。快捷鍵 <kbd>D</kbd>。'],
+        ['↻', '從第 01 段重新播放，並還原已儲存的相機、模式與氣量負荷。'],
+        ['畫質 · 高 / 均衡 / 輕量', '切換渲染畫質（<kbd>Q</kbd>）。自動降級會標示 <i>(自動)</i>；效能較弱的顯示卡請選 <b>輕量</b>。'],
+        ['二維視圖 / 三維視圖', '切換標註側視圖（<kbd>2</kbd>）。按鈕文字永遠顯示「按下後會切到哪個視圖」。'],
+        ['P&amp;I 圖', '切換管道儀表流程圖（<kbd>P</kbd>）。'],
+        ['EN / 繁中', '切換介面、導覽字幕與兩張工程圖的語言（<kbd>G</kbd>）。選擇會儲存在此瀏覽器。'],
+        ['手冊', '開啟本指南（<kbd>M</kbd>）。按 <kbd>Esc</kbd> 或 × 關閉。'],
+      ] },
+      { id: 'views', h: '4 · 二維側視圖與 P&amp;I 圖', p: [
+        '兩張工程圖都是即時 SVG，而非截圖：圖上的 HUD 顯示當前氣量負荷、SO₂ 去除率與出口讀數，流動虛線也隨求解器變化。開啟工程圖時會跳過 WebGL 繪製，因此也是效能最輕的瀏覽方式。',
+      ], rows: [
+        ['二維側視圖', '1:50 實機側視圖，共 14 個印刷標註：入口風管、急冷段、四級填料、除霧器、塔底液槽、加藥撬塊、漸縮出口、引風機與藍色電機。'],
+        ['P&amp;I 圖', '工藝管線、虛線信號線、儀表氣泡、調節閥與設備編號 P-101 … P-103 / T-102 … T-103，另附圖例與 DCS / PLC 交接點。'],
+        ['平移', '當圖面比視窗寬時，在圖內橫向滑動即可平移，並會顯示 <b>左右滑動查看</b> 提示。'],
+        ['標註', '所有零件名稱一次印在圖上。橘色滑鼠懸停反白僅存在於 3D 視圖。'],
+        ['切換', '三種視圖互斥：2D、P&amp;I 與 3D。再按一次作用中的按鈕（或快捷鍵）即可回到模型。'],
+      ] },
+      { id: 'modes', h: '5 · 底部模式按鈕', p: [
+        '這些模式會改變機器的呈現方式或求解器的運行方式，可以疊加使用 —— 例如 <b>剖切</b> + <b>慢放</b> + <b>標註</b>。',
+      ], rows: [
+        ['暫停 / 運行', '凍結或恢復求解器時鐘（<kbd>空白鍵</kbd>）。暫停時 3D 視角仍可旋轉。'],
+        ['分解', '沿組裝軸向分離各零件（<kbd>E</kbd>）。'],
+        ['剖切', '剖開玻璃鋼殼體，露出四級填料層與頂部噴淋總管（<kbd>C</kbd>）。'],
+        ['透視', '將殼體轉為半透明，顯示內部管路（<kbd>X</kbd>）。'],
+        ['慢放', '以較慢速度運行時鐘，適合觀察泵跳閘過程（<kbd>S</kbd>）。'],
+        ['標註', '在桌面顯示 3D 引線標註（<kbd>L</kbd>）；在手機上改為開啟二維側視圖，所有名稱都清晰可讀。'],
+        ['泵跳閘', '中斷液體循環：填料變乾，SO₂ 在數秒內穿透（<kbd>B</kbd>）。再按一次即可復原。'],
+      ] },
+      { id: 'readouts', h: '6 · 即時讀數與氣量負荷', p: [
+        '右側欄位（手機上為底部小型卡片）就是儀表盤，由求解器逐幀驅動，沒有任何預錄數值。',
+      ], rows: [
+        ['SO₂ 去除率', '主讀數。設計負載下約 97.5 %；氣量升高或液流中斷時會下降。'],
+        ['出口', '排氣筒濃度（ppmv）與狀態說明：<i>達標</i>、<i>吸收中</i>、<i>已穿透</i> 或 <i>泵已跳閘</i>。橘色數字代表未達標。'],
+        ['氣量負荷', '40–110 % 滑桿，兩端標示 <b>低負荷</b> 與 <b>超負荷</b>；急冷溫度、壓降、K<sub>G</sub>a 與去除率都會連動。'],
+        ['pH / ORP', '鹼性液槽目標 pH 8.5、酸調節後出口 pH 7、氧化還原電位約 +320 mV。三者會 <i>先於</i> SO₂ 穿透下跌 —— 這正是操作員提前察覺故障的依據。'],
+        ['計算方法', '可展開的推導說明，涵蓋濕空氣、Onda、Eckert 與 NTU 關聯式，以及所採用的簡化假設。'],
+      ], note: '在手機上，開啟二維側視圖或 P&I 圖時會隱藏讀數卡片，以免遮住圖面下方的標籤。關閉工程圖即會恢復。' },
+      { id: 'demo', h: '7 · 引導導覽', p: [
+        '導覽是一條七段的相機與狀態時間軸。進入時會儲存你的相機、模式、泵狀態與氣量負荷，結束時全部還原。',
+      ], list: [
+        '<b>01</b> 實機結構 · <b>02</b> 含硫煙氣進入 · <b>03</b> 橫向錯流接觸 · <b>04</b> 去除率逐級疊加 · <b>05</b> 改變氣量負荷 · <b>06</b> 循環泵跳閘 · <b>07</b> 恢復並自行探索。',
+        '用工具列按鈕或 <kbd>D</kbd> 播放、暫停與繼續；<b>↻</b> 從頭重播。',
+        '隨時按 <kbd>Esc</kbd> 或 <b>×</b> 結束導覽並還原先前視角。手機上字幕固定置於底部，不會遮住機器。',
+      ] },
+      { id: 'labels', h: '8 · 標註與橘色反白', p: [
+        '在桌面版，零件標註以引線連到幾何上的小黑點。滑鼠停在引線的任一端都會反白，而且是雙向連動：',
+      ], list: [
+        '停在 <b>黑色錨點</b> → 該標註文字、引線與錨點同時變橘色。',
+        '停在 <b>標註文字</b> → 同樣三處一起變橘色，因此可以立刻找到它所指向的零件。',
+        '移開指標即恢復黑色。同一時間只有一組標註反白，密集區域依然清楚。',
+      ], p2: [
+        '手機上會隱藏 3D 引線標註 —— 窄螢幕無法清楚排版。改由 <b>標註</b> 按鈕開啟二維側視圖，所有名稱都直接印在圖上。',
+      ] },
+      { id: 'keys', h: '9 · 鍵盤快捷鍵', p: [
+        '當輸入框取得焦點，或本手冊開啟時，快捷鍵不會作用。',
+      ], keys: [
+        ['D', '播放 / 暫停 / 繼續引導導覽'],
+        ['Q', '切換渲染畫質'],
+        ['G', '切換 EN / 繁中'],
+        ['M', '開啟或關閉本手冊'],
+        ['2', '切換二維側視圖'],
+        ['P', '切換 P&I 圖'],
+        ['L', '3D 零件標註（手機上改開二維圖）'],
+        ['E / C / X / S', '分解 / 剖切 / 透視 / 慢放'],
+        ['B', '循環泵跳閘或復原'],
+        ['空白鍵', '暫停或恢復求解器'],
+        ['Esc', '結束引導導覽，或關閉本手冊'],
+        ['拖曳 / 滾輪', '旋轉 / 縮放 3D 模型'],
+      ] },
+      { id: 'mobile', h: '10 · 手機、平板與效能', p: [
+        '手機版把 3D 機器框在畫面上方中央，讀數移到卡片底部。頂部工具列與底部模式列都可橫向滑動，不會有按鈕被截斷。',
+      ], rows: [
+        ['引導導覽', '導覽期間字幕移至底部位置、讀數卡片讓位；結束後全部復原。'],
+        ['2D / P&amp;I', '開啟任一工程圖時隱藏讀數卡片。在圖內滑動可平移；橫向滑動頂部工具列可找到「手冊」按鈕。'],
+        ['效能', '<b>畫質 · 輕量</b> 會關閉後處理以因應較弱的 GPU；二維與 P&amp;I 視圖完全跳過 WebGL，求解器仍持續運算。'],
+        ['語言', '<b>EN / 繁中</b> 同時套用至介面、導覽字幕與兩張工程圖，並儲存在此瀏覽器。'],
+        ['無障礙', '每個控制項都是具有可讀名稱的實體按鈕；本手冊開啟時會鎖定鍵盤焦點，關閉後焦點回到「手冊」按鈕。'],
+      ] },
+      { id: 'physics', h: '11 · 數字如何算出', p: [
+        '150 °C 煙氣先被急冷至絕熱飽和溫度（約 43 °C，以 Tetens 蒸汽壓搭配二分法求解），隨後依序穿過四層 0.6 m 填料；每層只去除進入其中的一部分，故 <b>η = 1 − Π(1 − η<sub>級</sub>)</b>。每級傳質單元數 NTU = K<sub>G</sub>a·t/u<sub>G</sub>，K<sub>G</sub>a 取自己發表的 50 mm 鮑爾環鹼洗塔數據，並每幀按氣量、Onda 潤濕面積、液量與潤濕狀態修正。',
+        '壓降採用 Eckert 通用關聯式沿 2.4 m 總填料深度積分，另加急冷段與除霧器餘量。NaOH 按吸收 SO₂ 的化學計量 × 1.15 投加，稀 H₂SO₄ 微調中和鹼液夾帶，使排液回到 pH 7 附近；泵功率為 ρgQH/η，流量 52 m³/h、揚程 18 m。',
+      ], note: '簡化假設：填料內為柱塞流、pH 恆定、噴淋均勻、不計 SO₃ 與飛灰負荷。本頁為教學模型 —— 完整推導請展開 <b>計算方法</b> 面板，切勿將這些數值作為電廠操作依據。' },
+    ],
     'film.runBeat': '它按真實化學過程運行。',
     'film.runSub': '氣體橫向穿過四級鹼液潤濕的填料，去除率逐級疊加。',
     'film.breakBeat': '讓循環泵跳閘。',
@@ -2632,7 +2856,7 @@ paintFilm()
     '<button id="lab2D" data-i18n-title="tool2d">2D view</button>' +
     '<button id="labPID" data-i18n-title="toolPid">P&amp;I</button>' +
     '<span class="lab-lang" role="group" aria-label="Language" data-i18n-aria="toolLang" data-i18n-title="toolLang"><button data-lang="en" class="act">EN</button><button data-lang="zh">繁中</button></span>' +
-    '<a href="crossflow-scrubber-manual.html" target="_blank" rel="noopener" data-i18n-title="toolManual"><span data-i18n="manual">Manual</span> &#8599;</a>'
+    '<button id="labManual" data-i18n-title="toolManual" data-i18n-aria="toolManual" aria-haspopup="dialog" aria-expanded="false"><span data-i18n="manual">Manual</span></button>'
   lab.ui.appendChild(tools)
 
   // The language control is a two-button segmented pill; the active half follows
@@ -3313,7 +3537,12 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
   .lab-modes button { flex:0 0 auto; min-height:38px; padding:0.5em 0.9em; white-space:nowrap; background:rgba(243,242,238,0.9) }
   .lab-night .lab-modes button { background:rgba(13,14,16,0.9) }
   .lab-modes kbd { display:none }
-  .lab-2d > svg, .lab-pid > svg { position:absolute; left:0; top:calc(112px + env(safe-area-inset-top)); transform:none; width:860px; max-width:none; height:auto }
+  /* The tool strip ends at 90px (50px top + 36px button + 4px scroll pad).
+     Pull the drawings up to 96px so the title sits 23px / 17px below the
+     toggles instead of 39px / 33px, without ever touching the button row.
+     Both orientations now share this offset: the old landscape override
+     pushed the drawing 8px lower for no reason. */
+  .lab-2d > svg, .lab-pid > svg { position:absolute; left:0; top:calc(96px + env(safe-area-inset-top)); transform:none; width:860px; max-width:none; height:auto }
   .lab-2d.on, .lab-pid.on { overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y }
   .lab-2d .panhint, .lab-pid .panhint { display:inline }
   html.flatview .lab-rail .lab-no, html.flatview .lab-rail .lab-title { display:none }
@@ -3327,7 +3556,13 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
   .lab-demo { top:calc(94px + env(safe-area-inset-top)); padding:0.25em 0.6em }
   .lab-demo-sub { display:none }
   .lab-demo-bar { margin-top:0.35em }
-  .lab-2d > svg, .lab-pid > svg { top:calc(104px + env(safe-area-inset-top)) }
+}
+/* Wide landscape phones (e.g. 844 × 390) are broader than the 760px mobile
+   breakpoint, so they keep the desktop layout. There the vertically centred
+   2D drawing slides up underneath the toolbar while the P&I drawing sits
+   ~60px too low. Anchor both just below the toggle row on short viewports. */
+@media (min-width:761px) and (max-width:1000px) and (max-height:560px) {
+  .lab-2d > svg, .lab-pid > svg { top:100px; transform:none }
 }
 /* ------------------------------------------------------------------ mobile
    The guided-tour caption used to float over the machine's inlet duct. On a
@@ -3338,9 +3573,10 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
   html.demo-on .lab-rail { display:none }
   html.demo-on .lab-demo { top:auto !important; bottom:calc(66px + env(safe-area-inset-bottom)) !important }
 
-  /* The P&I drawing is full height: the SO2 readout card would sit on top of
-     its lower tag rows, so the rail yields while P&I is open. */
-  html.pidview .lab-rail { display:none }
+  /* Both flat drawings (2D side elevation and P&I) are full height: the SO2
+     readout card would sit on top of their lower labels / tag rows, so the
+     rail yields while either drawing is open. flatview is set for 2D and P&I. */
+  html.flatview .lab-rail { display:none }
 }
 /* Landscape keeps the caption strip thin, but still in the bottom slot. */
 @media (max-width:760px) and (max-height:560px) {
@@ -3412,6 +3648,208 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
     if (!mq.matches) { if (open) setOpen(false) }
     else if (!open && lab.target.labels > 0.5) setOpen(true)
   })
+}
+
+// ------------------------------------------------------------------ user manual
+// The toolbar used to link to crossflow-scrubber-manual.html, which does not
+// exist (404). This is the real manual: a self-contained, bilingual, keyboard
+// accessible dialog that describes every control on the page. Content lives in
+// I18N[lang].manualSections so a language switch repaints it in place.
+{
+  const css = document.createElement('style')
+  css.textContent = `
+.lab-manual { position:fixed; inset:0; z-index:60; display:none; pointer-events:auto; font-family:var(--sans); color:var(--ink) }
+.lab-manual.open { display:block }
+.lm-backdrop { position:absolute; inset:0; background:rgba(18,18,17,.48); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px) }
+.lm-sheet { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(920px,calc(100vw - 32px)); max-height:min(88dvh,900px); display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--line); border-radius:10px; box-shadow:0 24px 90px rgba(0,0,0,.28); overflow:hidden }
+.lm-hd { display:flex; gap:1em; align-items:flex-start; justify-content:space-between; padding:1.1em 1.4em .9em; border-bottom:1px solid var(--line) }
+.lm-kicker { font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--mute) }
+.lm-hd h2 { font-family:var(--serif); font-weight:400; font-size:34px; line-height:1; margin:.22em 0 .18em }
+.lm-hd p { margin:0; font-size:12px; color:var(--mute); line-height:1.5; max-width:66ch }
+.lm-close { flex:0 0 auto; font:inherit; font-size:22px; line-height:1; width:36px; height:36px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:50%; cursor:pointer }
+.lm-close:hover, .lm-close:focus-visible { border-color:var(--accent); color:var(--accent); outline:none }
+.lm-wrap { display:flex; flex:1; min-height:0 }
+.lm-toc { flex:0 0 196px; padding:1em .8em 1em 1.4em; border-right:1px solid var(--line); overflow-y:auto; scrollbar-width:thin }
+.lm-toc > b { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--mute); margin-bottom:.8em }
+.lm-toc button { display:block; width:100%; text-align:left; font:inherit; font-size:12px; line-height:1.35; color:var(--mute); background:transparent; border:0; border-left:2px solid transparent; padding:.42em .6em; cursor:pointer }
+.lm-toc button:hover, .lm-toc button:focus-visible { color:var(--ink); outline:none }
+.lm-toc button.act { color:var(--accent); border-left-color:var(--accent) }
+.lm-body { flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain; padding:1.15em 1.6em 2.4em; font-size:13px; line-height:1.65; scrollbar-width:thin }
+.lm-sec { margin:0 0 2.2em; scroll-margin-top:1em }
+.lm-sec h3 { font-family:var(--serif); font-weight:400; font-size:24px; line-height:1.15; margin:0 0 .55em }
+.lm-sec p { margin:0 0 .8em; color:#4d4b47 }
+.lab-night .lm-sec p, .lab-night .lm-rows .v { color:#bdbab2 }
+.lm-sec ol { margin:0 0 1em; padding-left:1.5em }
+.lm-sec li { margin-bottom:.5em; color:#4d4b47 }
+.lab-night .lm-sec li { color:#bdbab2 }
+.lm-sec b { color:var(--ink); font-weight:600 }
+.lm-sec kbd { font-family:var(--mono); font-size:.86em; background:rgba(0,0,0,.05); border:1px solid var(--line); border-radius:3px; padding:.05em .4em; white-space:nowrap }
+.lab-night .lm-sec kbd { background:rgba(255,255,255,.07) }
+.lm-rows { display:grid; grid-template-columns:minmax(140px,32%) 1fr; border-top:1px solid var(--line); margin:.2em 0 1em }
+.lm-rows > div { padding:.5em .65em; border-bottom:1px solid var(--line) }
+.lm-rows .k { font-size:12px; font-weight:600; color:var(--ink) }
+.lm-rows .v { font-size:12.5px; color:#4d4b47 }
+.lm-keys { grid-template-columns:minmax(120px,24%) 1fr }
+.lm-keys .k { font-family:var(--mono); font-weight:500 }
+.lm-note { border-left:2px solid var(--accent); padding:.15em 0 .15em .9em; color:var(--mute); font-size:12px; line-height:1.6; margin-top:1em }
+.lm-ft { display:flex; justify-content:space-between; align-items:center; gap:1em; padding:.7em 1.4em; border-top:1px solid var(--line); font-size:11px; color:var(--mute) }
+.lm-ft kbd { font-family:var(--mono); font-size:.95em }
+@media (max-width:760px) {
+  .lm-sheet { width:calc(100vw - 16px); max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:8px }
+  .lm-hd { padding:.8em 1em .65em }
+  .lm-hd h2 { font-size:27px }
+  .lm-hd p { font-size:11px }
+  .lm-close { width:32px; height:32px; font-size:19px }
+  .lm-wrap { flex-direction:column }
+  .lm-toc { flex:0 0 auto; display:flex; align-items:center; gap:.35em; padding:.55em .8em; border-right:0; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; scrollbar-width:none }
+  .lm-toc::-webkit-scrollbar { display:none }
+  .lm-toc > b { display:none }
+  .lm-toc-list { display:flex; gap:.35em }
+  .lm-toc button { width:auto; flex:0 0 auto; white-space:nowrap; font-size:11px; border:1px solid var(--line); border-radius:999px; padding:.35em .7em }
+  .lm-toc button.act { border-color:var(--accent) }
+  .lm-body { padding:1em 1em 1.8em; font-size:12.5px }
+  .lm-sec h3 { font-size:21px }
+  .lm-rows { grid-template-columns:1fr }
+  .lm-rows .k { padding-bottom:0; border-bottom:0 }
+  .lm-rows .v { padding-top:.1em }
+  .lm-ft { padding:.55em 1em }
+  .lm-foot-hint { display:none }
+}
+`
+  document.head.appendChild(css)
+
+  const dlg = document.createElement('div')
+  dlg.className = 'lab-manual'
+  dlg.id = 'labManualDialog'
+  dlg.setAttribute('role', 'dialog')
+  dlg.setAttribute('aria-modal', 'true')
+  dlg.setAttribute('aria-labelledby', 'labManualTitle')
+  dlg.innerHTML = '<div class="lm-backdrop" data-lm-close></div>' +
+    '<div class="lm-sheet">' +
+      '<header class="lm-hd"><div><span class="lm-kicker"></span><h2 id="labManualTitle"></h2><p class="lm-sub"></p></div>' +
+      '<button type="button" class="lm-close" data-lm-close><span aria-hidden="true">&#215;</span></button></header>' +
+      '<div class="lm-wrap"><nav class="lm-toc"><b></b><div class="lm-toc-list"></div></nav>' +
+      '<div class="lm-body"></div></div>' +
+      '<footer class="lm-ft"><span class="lm-foot-text"></span><span class="lm-foot-hint"></span></footer>' +
+    '</div>'
+  lab.ui.appendChild(dlg)
+
+  const btn = document.getElementById('labManual')
+  const bodyEl = dlg.querySelector('.lm-body')
+  const tocList = dlg.querySelector('.lm-toc-list')
+  const closeBtn = dlg.querySelector('.lm-close')
+  let isOpen = false, lastFocus = null, wasPlaying = false
+
+  const para = (arr) => (arr || []).map((t) => `<p>${t}</p>`).join('')
+  const rows = (arr, cls) => (arr && arr.length)
+    ? `<div class="lm-rows ${cls || ''}">${arr.map(([k, v]) => `<div class="k">${k}</div><div class="v">${v}</div>`).join('')}</div>` : ''
+
+  function paintManual() {
+    const S = tr('manualSections') || []
+    dlg.querySelector('.lm-kicker').textContent = tr('manualKicker')
+    dlg.querySelector('#labManualTitle').textContent = tr('manualTitle')
+    dlg.querySelector('.lm-sub').textContent = tr('manualSub')
+    closeBtn.setAttribute('aria-label', tr('manualClose'))
+    closeBtn.title = tr('toolCloseManual')
+    dlg.querySelector('.lm-toc > b').textContent = tr('manualToc')
+    dlg.querySelector('.lm-toc').setAttribute('aria-label', tr('manualToc'))
+    dlg.querySelector('.lm-foot-text').textContent = tr('manualFoot')
+    dlg.querySelector('.lm-foot-hint').innerHTML = tr('manualHint')
+    bodyEl.innerHTML = S.map((s) =>
+      `<section class="lm-sec" id="lm-${s.id}"><h3>${s.h}</h3>` +
+      para(s.p) +
+      (s.list?.length ? `<ol>${s.list.map((t) => `<li>${t}</li>`).join('')}</ol>` : '') +
+      para(s.p2) +
+      rows(s.rows) +
+      rows(s.keys, 'lm-keys') +
+      (s.note ? `<div class="lm-note">${s.note}</div>` : '') +
+      '</section>'
+    ).join('')
+    tocList.innerHTML = S.map((s) => `<button type="button" data-go="${s.id}">${s.h}</button>`).join('')
+    bodyEl.scrollTop = 0
+    if (isOpen) markToc()
+  }
+  onLang(paintManual)
+
+  function markToc() {
+    const base = bodyEl.getBoundingClientRect().top
+    let cur = ''
+    for (const sec of bodyEl.querySelectorAll('.lm-sec')) {
+      if (sec.getBoundingClientRect().top - base <= 48) cur = sec.id.slice(3)
+    }
+    for (const b of tocList.querySelectorAll('button')) b.classList.toggle('act', b.dataset.go === cur)
+  }
+  bodyEl.addEventListener('scroll', markToc, { passive: true })
+
+  function open() {
+    if (isOpen) return
+    isOpen = true
+    lastFocus = document.activeElement
+    // The tour keeps owning the camera behind a modal; hold it so the user does
+    // not lose their place in the chapters while reading.
+    wasPlaying = !!window.__demo?.state.active && window.__demo.state.playing
+    if (wasPlaying) window.__demo.pause()
+    paintManual()
+    dlg.classList.add('open')
+    btn?.setAttribute('aria-expanded', 'true')
+    document.documentElement.classList.add('manual-open')
+    closeBtn.focus({ preventScroll: true })
+    markToc()
+  }
+  function close() {
+    if (!isOpen) return
+    isOpen = false
+    dlg.classList.remove('open')
+    btn?.setAttribute('aria-expanded', 'false')
+    document.documentElement.classList.remove('manual-open')
+    if (wasPlaying && window.__demo?.state.active && !window.__demo.state.playing) window.__demo.resume()
+    wasPlaying = false
+    // document.body is not focusable, so focusing lastFocus would leave the
+    // caret inside a hidden dialog. The toggle is always a real button.
+    ;(btn ?? lastFocus)?.focus?.({ preventScroll: true })
+  }
+  const toggle = () => isOpen ? close() : open()
+
+  btn?.addEventListener('click', toggle)
+  dlg.addEventListener('click', (e) => {
+    if (e.target.closest('[data-lm-close]')) { close(); return }
+    const go = e.target.closest('button[data-go]')?.dataset.go
+    if (!go) return
+    const sec = bodyEl.querySelector('#lm-' + go)
+    if (!sec) return
+    const top = sec.getBoundingClientRect().top - bodyEl.getBoundingClientRect().top + bodyEl.scrollTop - 12
+    // Direct assignment rather than scrollTo({behavior:'smooth'}): headless /
+    // reduced-motion renderers can leave a smooth scroll at currentTime 0,
+    // which silently makes the contents links look broken.
+    bodyEl.scrollTop = top
+    markToc()
+  })
+
+  // Capture phase: while the dialog is open all other page shortcuts (D/Q/2/P/
+  // Space/letter modes) must not fire behind it. Esc and M are consumed here so
+  // the guided demo's own Esc handler cannot also end the tour.
+  const typing = (t) => t?.tagName === 'INPUT' || t?.tagName === 'TEXTAREA' || t?.isContentEditable
+  addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase()
+    if (!isOpen) {
+      if (k === 'm' && !typing(e.target)) { e.preventDefault(); e.stopPropagation(); open() }
+      return
+    }
+    if (k === 'escape' || k === 'm') { e.preventDefault(); e.stopPropagation(); close(); return }
+    if (e.key === 'Tab') {
+      const f = [...dlg.querySelectorAll('button')].filter((el) => el.offsetParent !== null)
+      if (f.length) {
+        const first = f[0], last = f[f.length - 1]
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
+      e.stopPropagation()
+      return
+    }
+    e.stopPropagation()
+  }, true)
+
+  window.__manual = { open, close, toggle, get open() { return isOpen } }
 }
 
 lab.start()
