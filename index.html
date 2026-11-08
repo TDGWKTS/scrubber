@@ -75,8 +75,6 @@ const I18N = {
     toolLang: 'Switch language', toolManual: 'Open the control manual',
     hudLoad: 'GAS LOAD', hudRem: 'SO₂ REMOVAL', hudOutlet: 'OUTLET', hudPumpTripped: 'PUMP TRIPPED',
     swipeHint: 'SWIPE TO PAN →',
-    mobileLabels: 'PART LABELS',
-    mobileLabelsHint: 'Tap a name to show its label on the drawing',
     'film.runBeat': 'It runs on real chemistry.',
     'film.runSub': 'Gas crosses four caustic-wetted pads sideways; removal compounds stage by stage.',
     'film.breakBeat': 'Trip the pump.',
@@ -134,8 +132,6 @@ const I18N = {
     toolLang: '切換語言', toolManual: '打開操作手冊',
     hudLoad: '氣量負荷', hudRem: 'SO₂ 去除率', hudOutlet: '出口', hudPumpTripped: '泵已跳閘',
     swipeHint: '← 左右滑動查看 →',
-    mobileLabels: '零件標註',
-    mobileLabelsHint: '點選名稱，在圖上顯示該標註',
     'film.runBeat': '它按真實化學過程運行。',
     'film.runSub': '氣體橫向穿過四級鹼液潤濕的填料，去除率逐級疊加。',
     'film.breakBeat': '讓循環泵跳閘。',
@@ -753,9 +749,12 @@ html,body { margin:0; height:100%; background:var(--paper); color:var(--ink); fo
 .lab-scale { position:absolute; left:4.2vw; bottom:calc(4.2vh + 3.4em); font-size:clamp(10px,0.8vw,14px); color:var(--mute); font-variant-numeric:tabular-nums }
 .lab-scale div { height:1px; background:var(--mute); margin-top:0.35em; position:relative } .lab-scale div::before,.lab-scale div::after { content:''; position:absolute; top:-3px; width:1px; height:7px; background:var(--mute) } .lab-scale div::after { right:0 }
 .lab-labels { position:absolute; inset:0 } .lab-labels svg { position:absolute; inset:0; width:100%; height:100% }
-.lab-lab { position:absolute; font-size:clamp(11px,0.86vw,16px); color:var(--ink); white-space:nowrap; transform:translate(0,-50%); transition:opacity .35s; line-height:1.25; text-shadow:0 0 3px var(--paper), 0 0 8px var(--paper), 0 0 14px var(--paper) }
+.lab-lab { position:absolute; font-size:clamp(11px,0.86vw,16px); color:var(--ink); white-space:nowrap; transform:translate(0,-50%); transition:opacity .35s, color .18s; line-height:1.25; text-shadow:0 0 3px var(--paper), 0 0 8px var(--paper), 0 0 14px var(--paper) }
 .lab-lab small { display:block; color:var(--mute); font-size:0.86em; font-variant-numeric:tabular-nums }
 .lab-lab.left { transform:translate(-100%,-50%); text-align:right }
+/* Hovering a label's black anchor dot paints the whole label orange. */
+.lab-lab.hot { color:var(--accent) }
+.lab-lab.hot small { color:var(--accent) }
 .lab-beat { position:absolute; left:4.2vw; bottom:4.6vh; display:flex; align-items:center; gap:0.85em; font-size:clamp(16px,1.9vw,36px); letter-spacing:-0.01em; opacity:0; transition:none }
 .lab-beat .n { font-size:0.5em; border:1px solid var(--faint); color:var(--mute); padding:0.42em 0.62em; line-height:1; font-variant-numeric:tabular-nums }
 .lab-beat b { font-weight:500 } .lab-beat span { color:var(--mute) }
@@ -805,6 +804,10 @@ export class Lab {
     this.timeScale = 1
     this.parts = []
     this.labels = []
+    // Anchor-dot hover: hotL is the label object under the pointer, hotPts is
+    // the screen-space list rebuilt by _updateLabels each frame.
+    this.hotL = null
+    this.hotPts = []
     this.tickers = []
     this.ghosts = []
     this.state = { explode: 0, cut: 0, xray: 0, slow: 0, labels: 0, broken: 0 }
@@ -1271,6 +1274,35 @@ export class Lab {
       m.castShadow = x < 0.5
     }
   }
+  /** Hovering a label's black anchor dot OR the label text paints both ends
+      orange. The hit test is analytic instead of CSS :hover: _updateLabels()
+      rebuilds the leader-line SVG every frame, which would destroy DOM hover
+      state. Both directions share this one hit test, so dot -> text and
+      text -> dot always agree on a single highlighted label. */
+  _initLabelHover() {
+    const box = this.$('.lab-labels')
+    addEventListener('pointermove', (e) => {
+      if (this.state.labels < 0.3 || document.documentElement.classList.contains('flatview')) {
+        this.hotL = null; return
+      }
+      const r = box.getBoundingClientRect()
+      const x = e.clientX - r.left, y = e.clientY - r.top
+      // 1. A black anchor dot wins when the pointer is close to one.
+      let best = null, bd = 16 * 16
+      for (const p of this.hotPts) {
+        const dx = p.x - x, dy = p.y - y, d = dx * dx + dy * dy
+        if (d < bd) { bd = d; best = p.L }
+      }
+      // 2. Otherwise, hovering the text itself highlights its anchor dot.
+      if (!best) {
+        const el = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.lab-lab')
+        if (el) best = this.labels.find((L) => L.el === el) ?? null
+      }
+      this.hotL = best
+    }, { passive: true })
+    addEventListener('blur', () => { this.hotL = null })
+    document.addEventListener('pointerleave', () => { this.hotL = null })
+  }
   _updateLabels() {
     const on = this.state.labels
     const W = innerWidth, H = innerHeight
@@ -1278,11 +1310,12 @@ export class Lab {
     let lines = ''
     const ctr = new THREE.Vector3().setFromMatrixPosition(this.machine.matrixWorld).project(this.camera)
     const items = []
+    const hotL = on > 0.3 ? this.hotL : null
     for (const L of this.labels) {
       const p = L.at.clone(); L.obj.updateWorldMatrix(true, false); p.applyMatrix4(L.obj.matrixWorld)
       const s = p.project(this.camera)
       const vis = on > 0.01 && s.z < 1 && L.obj.visible !== false
-      if (!vis) { L.el.style.opacity = '0'; continue }
+      if (!vis) { L.el.style.opacity = '0'; L.el.style.pointerEvents = 'none'; continue }
       const x = (s.x * 0.5 + 0.5) * W, y = (-s.y * 0.5 + 0.5) * H
       const side = L.side ?? (s.x < ctr.x ? 'left' : 'right')
       items.push({ L, x, y, side })
@@ -1296,14 +1329,25 @@ export class Lab {
       const xs = side === 'left' ? Math.min(...list.map((i) => i.x)) - W * 0.06 : Math.max(...list.map((i) => i.x)) + W * 0.06
       for (const it of list) it.lx = clamp(xs, W * 0.05, W * 0.7)
     }
+    const pts = []
     for (const it of items) {
       const { L, x, y, lx, ly, side } = it
-      L.el.className = 'lab-lab' + (side === 'left' ? ' left' : '')
+      const hot = L === hotL
+      pts.push({ x, y, L })
+      L.el.className = 'lab-lab' + (side === 'left' ? ' left' : '') + (hot ? ' hot' : '')
       L.el.style.left = `${lx + (side === 'left' ? -8 : 8)}px`; L.el.style.top = `${ly}px`; L.el.style.opacity = String(on)
+      // The UI overlay is pointer-events:none; let the text itself be hoverable
+      // only while labels are actually shown.
+      const pe = on > 0.3 ? 'auto' : 'none'
+      if (L.el.style.pointerEvents !== pe) L.el.style.pointerEvents = pe
       if (L.value) L.small.textContent = L.value()
       const ink = this.theme === 'paper' ? '20,20,20' : '240,238,232'
-      lines += `<path d="M${x.toFixed(1)},${y.toFixed(1)} L${(lx + (side === 'left' ? 12 : -12)).toFixed(1)},${ly.toFixed(1)} L${lx.toFixed(1)},${ly.toFixed(1)}" stroke="rgba(${ink},${(0.55 * on).toFixed(3)})" stroke-width="1" fill="none"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="rgba(${ink},${on.toFixed(3)})" stroke="${this.theme === 'paper' ? '#fff' : '#000'}" stroke-width="1.2"/>`
+      const edge = this.theme === 'paper' ? '#fff' : '#000'
+      const line = hot ? '#e4572e' : `rgba(${ink},${(0.55 * on).toFixed(3)})`
+      const dot = hot ? '#e4572e' : `rgba(${ink},${on.toFixed(3)})`
+      lines += `<path d="M${x.toFixed(1)},${y.toFixed(1)} L${(lx + (side === 'left' ? 12 : -12)).toFixed(1)},${ly.toFixed(1)} L${lx.toFixed(1)},${ly.toFixed(1)}" stroke="${line}" stroke-width="${hot ? 1.8 : 1}" fill="none"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${hot ? 4.6 : 3}" fill="${dot}" stroke="${edge}" stroke-width="1.2"/>`
     }
+    this.hotPts = pts
     svg.innerHTML = lines
   }
   _updateScale() {
@@ -1338,6 +1382,7 @@ export class Lab {
   start() {
     this._modes()
     this._syncButtons()
+    this._initLabelHover()
     // cut and labels reach: frame the shadow camera to the machine
     const box = new THREE.Box3().setFromObject(this.machine)
     const sz = box.getSize(new THREE.Vector3()).length() * 0.65
@@ -3293,127 +3338,37 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
   html.demo-on .lab-rail { display:none }
   html.demo-on .lab-demo { top:auto !important; bottom:calc(66px + env(safe-area-inset-bottom)) !important }
 
-  /* Labels toggle -> the 2D diagram card plus a hover/tap label picker. */
-  .lab-mobile-labels { position:absolute; left:12px; right:12px; bottom:calc(66px + env(safe-area-inset-bottom)); max-height:min(38dvh,220px); overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; display:none; pointer-events:auto; background:rgba(243,242,238,.95); border:1px solid var(--line); border-radius:8px; box-shadow:0 8px 30px rgba(30,28,24,.10); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); z-index:3 }
-  .lab-night .lab-mobile-labels { background:rgba(13,14,16,.94) }
-  html.labels-open .lab-mobile-labels { display:block }
-  html.labels-open .lab-rail > .lab-side { display:none }
-  html.labels-open .lab-modes button[data-k=labels] { background:var(--accent); border-color:var(--accent); color:#fff }
-  .lab-mobile-labels .hd { position:sticky; top:0; z-index:1; display:flex; justify-content:space-between; align-items:baseline; gap:.5em; padding:.55em .6em .45em; font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--mute); background:rgba(243,242,238,.98); border-bottom:1px solid var(--line) }
-  .lab-night .lab-mobile-labels .hd { background:rgba(13,14,16,.98) }
-  .lab-mobile-labels .hd b { color:var(--ink); font-weight:600 }
-  .lab-mobile-labels .hd span { font-size:.92em; text-align:right }
-  .lab-mobile-labels .row { display:flex; align-items:center; gap:.65em; width:100%; min-height:40px; padding:.55em .6em; font:inherit; font-size:12px; line-height:1.25; color:var(--ink); text-align:left; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; cursor:pointer; white-space:normal }
-  .lab-mobile-labels .row:last-child { border-bottom:0 }
-  .lab-mobile-labels .row .dot { flex:0 0 auto; width:8px; height:8px; border-radius:50%; border:1px solid var(--mute) }
-  .lab-mobile-labels .row.act, .lab-mobile-labels .row:hover, .lab-mobile-labels .row:focus-visible { background:rgba(20,20,20,.07); outline:none }
-  .lab-night .lab-mobile-labels .row.act, .lab-night .lab-mobile-labels .row:hover { background:rgba(255,255,255,.08) }
-  .lab-mobile-labels .row.act .dot { background:var(--accent); border-color:var(--accent) }
-  .lab-mobile-labels .row.act b { color:var(--accent) }
-  /* Only the row currently hovered / tapped is painted on the drawing. */
-  html.labels-open .lab-2d text[data-l]:not([data-l="0"]):not([data-l="1"]):not([data-l="13"]) { opacity:0; transition:opacity .18s }
-  html.labels-open .lab-2d text[data-l].reveal { opacity:1 !important; fill:var(--accent) }
+  /* The P&I drawing is full height: the SO2 readout card would sit on top of
+     its lower tag rows, so the rail yields while P&I is open. */
+  html.pidview .lab-rail { display:none }
 }
 /* Landscape keeps the caption strip thin, but still in the bottom slot. */
 @media (max-width:760px) and (max-height:560px) {
   html.demo-on .lab-demo { top:auto !important; bottom:calc(66px + env(safe-area-inset-bottom)) !important }
-  .lab-mobile-labels { max-height:34dvh }
 }
-/* The picker is mobile-only; keep it out of the desktop layout entirely. */
-.lab-mobile-labels { display:none }
-/* Leader line + hotspot painted above the 2D line work. */
-.lab-2d-pointer { pointer-events:none }
-.lab-2d-pointer path { fill:none; stroke:var(--accent); stroke-width:1.6; stroke-dasharray:5 4 }
-.lab-2d-pointer circle { fill:var(--accent); stroke:var(--paper); stroke-width:2 }
 `
   document.head.appendChild(css)
 }
 
-// ------------------------------------------------------------------ mobile label picker
-// The 3D leader-line labels are hidden on a phone (they cannot be laid out
-// legibly in 390px). The Labels toggle therefore opens the 2D side elevation
-// plus a compact list of part names: hovering / tapping one row reveals just
-// that label, with a leader line back to its hotspot on the drawing.
+// ------------------------------------------------------------------ mobile labels
+// A phone cannot lay out the 3D leader-line labels legibly, so the Labels
+// toggle shows the 2D side elevation instead. That drawing keeps every static
+// label visible at once: no picker card, no one-at-a-time hover reveal.
 {
   const mq = matchMedia('(max-width:760px)')
   const root = document.documentElement
-  const flat = document.querySelector('.lab-2d')
-  const svg = flat?.querySelector('svg')
-  const NS = 'http://www.w3.org/2000/svg'
-  // data-l index -> [x, y] of the part's hotspot in the 1000x520 drawing
-  const PARTS = [
-    [2, 90, 294], [3, 90, 400], [4, 460, 412], [5, 220, 214],
-    [6, 460, 188], [7, 702, 290], [8, 795, 274], [9, 906, 275],
-    [10, 963, 275], [11, 424, 290], [12, 464, 480],
-  ]
-  const pointer = document.createElementNS(NS, 'g')
-  pointer.setAttribute('class', 'lab-2d-pointer')
-  svg?.appendChild(pointer)
-
-  const card = document.createElement('div')
-  card.className = 'lab-mobile-labels'
-  card.innerHTML = '<div class="hd"><b></b><span></span></div><div class="rows"></div>'
-  lab.ui.appendChild(card)
-  const rowsEl = card.querySelector('.rows')
-
-  let open = false, current = null, prevMode = '3d'
-
-  function clearReveal() {
-    current = null
-    for (const t of svg.querySelectorAll('text[data-l].reveal')) t.classList.remove('reveal')
-    for (const r of rowsEl.querySelectorAll('.row.act')) r.classList.remove('act')
-    pointer.replaceChildren()
-  }
-
-  function reveal(i, row) {
-    current = i
-    for (const t of svg.querySelectorAll('text[data-l].reveal')) t.classList.remove('reveal')
-    for (const r of rowsEl.querySelectorAll('.row.act')) r.classList.remove('act')
-    row?.classList.add('act')
-    const t = svg.querySelector(`text[data-l="${i}"]`)
-    const p = PARTS.find((q) => q[0] === i)
-    if (!t || !p) return
-    t.classList.add('reveal')
-    const tx = Number(t.getAttribute('x')), ty = Number(t.getAttribute('y'))
-    const path = document.createElementNS(NS, 'path')
-    path.setAttribute('d', `M ${p[1]} ${p[2]} L ${tx} ${ty - 5}`)
-    const dot = document.createElementNS(NS, 'circle')
-    dot.setAttribute('cx', p[1]); dot.setAttribute('cy', p[2]); dot.setAttribute('r', '5')
-    pointer.replaceChildren(path, dot)
-    // Pan the wide drawing so the revealed label is inside the phone viewport.
-    const scale = svg.getBoundingClientRect().width / 1000
-    if (scale > 0) flat.scrollLeft = Math.max(0, Math.min(tx * scale - innerWidth * 0.5, flat.scrollWidth - flat.clientWidth))
-  }
-
-  function paintCard() {
-    const L = tr('elevLabels')
-    card.querySelector('.hd b').textContent = tr('mobileLabels')
-    card.querySelector('.hd span').textContent = tr('mobileLabelsHint')
-    rowsEl.innerHTML = PARTS.map(([i]) => `<button type="button" class="row" data-i="${i}"><span class="dot"></span><b>${L[i]}</b></button>`).join('')
-    for (const r of rowsEl.querySelectorAll('.row')) {
-      const i = Number(r.dataset.i)
-      r.addEventListener('pointerenter', () => reveal(i, r))
-      r.addEventListener('click', () => reveal(i, r))
-      r.addEventListener('focus', () => reveal(i, r))
-      if (i === current) r.classList.add('act')
-    }
-  }
-  onLang(paintCard)
+  let open = false, prevMode = '3d'
 
   function setOpen(on, restoreView = true) {
     if (on === open) return
     open = on
-    root.classList.toggle('labels-open', on)
     if (on) {
       prevMode = window.__view.mode
       window.__view.set('2d')
-      paintCard()
-      clearReveal()
-    } else {
-      clearReveal()
-      // Go back to whatever view was showing before the picker opened, so a
-      // user who was already browsing the 2D drawing is not thrown into 3D.
-      if (restoreView && window.__view.mode === '2d') window.__view.set(prevMode === '2d' || prevMode === 'pid' ? prevMode : '3d')
+    } else if (restoreView && window.__view.mode === '2d') {
+      // Go back to whatever was showing before, so a user already browsing the
+      // 2D drawing is not thrown into 3D.
+      window.__view.set(prevMode === '2d' || prevMode === 'pid' ? prevMode : '3d')
     }
   }
 
@@ -3425,15 +3380,14 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
     if (!mq.matches) return
     if (e.target.closest('button')?.dataset.k !== 'labels') return
     setTimeout(() => {
-      // During the tour the demo owns the camera and the mode state; the 2D
-      // picker would fight it, so just put the toggle back.
+      // During the tour the demo owns the camera and the mode state.
       if (window.__demo?.state.active) { lab.toggle('labels', 0); return }
       setOpen(lab.target.labels > 0.5)
     }, 0)
   })
 
-  // Leave the picker before the tour snapshots the mode state. Capture phase
-  // runs ahead of the demo's own click handler, so the saved state is clean.
+  // Leave 2D before the tour snapshots the view state. Capture phase runs ahead
+  // of the demo's own click handler, so the saved state is clean.
   const beforeDemo = () => {
     if (!mq.matches) return
     if (open) setOpen(false, false)
@@ -3458,7 +3412,6 @@ html.flatview .lab-2d.on, html.flatview .lab-pid.on { pointer-events:auto }
     if (!mq.matches) { if (open) setOpen(false) }
     else if (!open && lab.target.labels > 0.5) setOpen(true)
   })
-  paintCard()
 }
 
 lab.start()
